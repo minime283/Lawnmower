@@ -1,0 +1,9 @@
+SDL/*
+ipch/*
+Lawnmower/Debug/*
+*.opensdf
+*.sdf
+*.suo
+*.pdb
+*.exe
+*.ilk
