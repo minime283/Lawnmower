@@ -1,5 +1,4 @@
 #include "lawnmower.h"
-
 //Method for position of grass, and if the grass has been cut
 void growGrass(){
 	int x,y;
@@ -20,12 +19,32 @@ void InitGL(){
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	growGrass();
-	//Textures being loaded from texture.cpp
-	//Files are contained in data folder
-	//side_texture = test.Loadbitmap("data/side.bmp");
-	//top_texture = test.Loadbitmap("data/top.bmp");
-	//bot_texture = test.Loadbitmap("data/bot.bmp");
-}
+	SDL_Surface* sur;
+
+	sur = SDL_LoadBMP("../Assets/side.bmp");
+	glGenTextures(1, &side_texture);
+	glBindTexture( GL_TEXTURE_2D, side_texture );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexImage2D(GL_TEXTURE_2D,0,sur->format->BytesPerPixel,sur->w,sur->h,0,GL_RGB,GL_UNSIGNED_BYTE,sur->pixels);
+	SDL_FreeSurface(sur);
+	
+	sur = SDL_LoadBMP("../Assets/top.bmp");
+	glGenTextures(1, &top_texture);
+	glBindTexture( GL_TEXTURE_2D, top_texture );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexImage2D(GL_TEXTURE_2D,0,sur->format->BytesPerPixel,sur->w,sur->h,0,GL_RGB,GL_UNSIGNED_BYTE,sur->pixels);
+	SDL_FreeSurface(sur);
+	
+	sur = SDL_LoadBMP("../Assets/bot.bmp");
+	glGenTextures(1, &bot_texture);
+	glBindTexture( GL_TEXTURE_2D, bot_texture );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexImage2D(GL_TEXTURE_2D,0,sur->format->BytesPerPixel,sur->w,sur->h,0,GL_RGB,GL_UNSIGNED_BYTE,sur->pixels);
+	SDL_FreeSurface(sur);
+	}
 //draws a 1x1 cube. Lawnmower is drawn entirely of these cubes (not including the wheels) (extorted of course)
 void drawCube(int size){
 	float plane=0;
@@ -168,7 +187,6 @@ void handleResize(int width, int height)
 */
 void landscape(){
 	GLfloat  x,y,gx,gy;
-	//int seed = 245;
 	//seed the random function with an arbitrary constant (but still constant)
 	//this allows the randomness of the field to NOT change on every render
 	srand(245);
@@ -273,72 +291,6 @@ void disp(){
 	SDL_GL_SwapBuffers();
 }
 
-void specialKey(unsigned char key, int x, int y) { 
-// Check which key is pressed
-	switch(key) {
-		//Start Rotation Keys
-		case 'a': // Rotates on x axis by -1 degree
-			rotX -= 3.0;
-		break;
-		case 's': // Rotates on x axis by 1 degree
-			rotX += 3.0;
-		break;
-		case 'q': // Rotates on y axis by -1 degree
-			rotY -= 3.0;
-		break;
-		case 'w': // Rotates on y axis by 1 degree
-			rotY += 3.0;
-		break;
-		case 'z': // Rotates on z axis by -1 degree
-			rotZ -= 3.0; 
-		break;
-		case 'x': // Rotates on z axis by 1 degree
-			rotZ += 3.0; 
-		break;
-		
-		//Start Translations
-		case 't': // Translates Left
-			transX -= 1;
-		break;
-		case 'y': // Translates Right
-			transX += 1;
-		break;
-		case 'g': // Down
-			transY -= 1;
-		break;
-		case 'h': // Up
-			transY += 1;
-		break;
-		case 'i': // Down
-			transZ -= 1;
-		break;
-		case 'o': // Up
-			transZ += 1;
-		break;
-
-	}
-	//Debug:: Output coordinates of playing field
-	//printf("transX:%f,transY:%ftransZ:%f\n",transX,transY,transZ);
-	//printf("rotX:%f,rotY:%frotZ:%f\n",rotX,rotY,rotZ);
-    //glutPostRedisplay(); // Redraw the scene
-}
-
-void processMouse(int button, int state, int x, int y) {
-		/*if (button == GLUT_LEFT_BUTTON ) { //when left mouse button is pressed
-			scaleX -= 0.10f; //Scale negative on x
-			scaleY -= 0.10f; //Scale Negative on y 
-			//It will increase it size on both x and y
-			 //glScalef(scaleX, scaleY, 1.0);
-		}
-		else if (button == GLUT_RIGHT_BUTTON ) {
-			scaleY += 0.10f; //Scale positive on X
-			scaleX += 0.10f; // Scale positive on Y
-			//It will increase it size on both x and y
-
-			 //glScalef(scaleX, scaleY, 1.0);
-		}*/
-		// glutPostRedisplay(); // Redraw the scene
-}
 void checkCollision()
 {
 	if(lawnmowerright < 0) {
@@ -355,34 +307,82 @@ void checkCollision()
 	}
 	grasscut[(int)lawnmowerright][(int)lawnmowerup] = 1;
 }
-//Begin Keyboard Controls
-void processSpecial( SDL_keysym key){
-	
-	if(key.sym == movedown) {
-		lawnmowerup += 0.5;		
-		lawnmowerrotation = 180;
+
+void processMovement(){
+	lawnmowerup += cony;
+	lawnmowerright += conx;
+	//this rotation stuff is necessary
+	if (conx != 0 || cony != 0) {
+
+		if (conx == 0) {
+			if (cony > 0) {
+				lawnmowerrotation = 180;
+			} else {
+				lawnmowerrotation = 0;
+			}
+		} else if (cony == 0) {
+			if (conx > 0) {
+				lawnmowerrotation = 270;
+			} else {
+				lawnmowerrotation = 90;
+			}
+		} else {
+			//some combination of both
+			lawnmowerrotation = atan((double)conx/cony) * 180/3.1415926;
+			if (cony > 0) {
+				lawnmowerrotation += 180;
+			}
+		}
 	}
-	if(key.sym == moveup) {
-		lawnmowerup -= 0.5;
-		lawnmowerrotation = 0;
-	}
-	if(key.sym == moveright) {
-		lawnmowerright += 0.5;
-		lawnmowerrotation = 270;
-	}
-	if(key.sym == moveleft) {
-		lawnmowerright -= 0.5;
-		lawnmowerrotation = 90;
-	}
-	if(key.sym == reset) {
-		growGrass();
-		
-	}
+	rotX += conrotx;
+	rotY += conroty;
 	checkCollision();
 }
 
-void processJoystiq(){
-	checkCollision();
+void handleKeyboardUp(SDL_KeyboardEvent Event)
+{
+	if (Event.keysym.sym == moveup)
+		cony += 0.5;
+	else if(Event.keysym.sym == movedown)
+		cony -= 0.5;
+	else if (Event.keysym.sym == moveleft)
+		conx += 0.5;
+	else if (Event.keysym.sym == moveright)
+		conx -= 0.5;
+
+	if(Event.keysym.sym == reset) {
+		growGrass();	
+	}
+}
+
+void handleKeyboardDown(SDL_KeyboardEvent Event)
+{
+	if (Event.keysym.sym == movedown)
+		cony += 0.5;
+	if (Event.keysym.sym == moveup)
+		cony -= 0.5;
+
+	if (Event.keysym.sym == moveleft)
+		conx -= 0.5;
+	if (Event.keysym.sym == moveright)
+		conx += 0.5;
+}
+
+void handleJoystickAxis(SDL_JoyAxisEvent Event)
+{
+	if (Event.axis == 0) {
+		conx = Event.value /60000.0f;
+		if(abs(conx) < 0.125) {conx = 0;}
+	} else if(Event.axis == 1) {
+		cony = Event.value /60000.0f;
+		if(abs(cony) < 0.125) {cony = 0;}
+	} else if(Event.axis == 3) {
+		conrotx = Event.value / 60000.0f;
+		if(abs(conrotx) < 0.125) {conrotx = 0;}
+	} else if(Event.axis == 4) {
+		conroty = Event.value / 60000.0f;
+		if(abs(conroty) < 0.125) {conroty = 0;}
+	}
 }
 
 
@@ -396,9 +396,15 @@ void checkevents()
 				break;
 			case SDL_VIDEORESIZE:
 				handleResize(Event.resize.w,Event.resize.h);
-				break;
+				break;								
 			case SDL_KEYDOWN:
-				processSpecial(Event.key.keysym);
+				handleKeyboardDown(Event.key);
+				break;
+			case SDL_KEYUP:
+				handleKeyboardUp(Event.key);
+				break;
+			case SDL_JOYAXISMOTION:
+				handleJoystickAxis(Event.jaxis);
 				break;
 		}
 	}
@@ -407,26 +413,23 @@ void checkevents()
 int main(int argc, char** argv)
 {
 
-	SDL_Init(SDL_INIT_VIDEO);
-	//SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,1);
-	//SDL_Window window = SDL_CreateWindow("Lawnmower mowing the lawn.",300,100,750,550,SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
 	SDL_Surface* screen = SDL_SetVideoMode(640,480,16,SDL_OPENGL |SDL_DOUBLEBUF|SDL_HWSURFACE |SDL_RESIZABLE);
-	//glutKeyboardFunc(specialKey); //Apply keyboard Control
-	//glutSpecialFunc(processSpecial);
-	//glutMouseFunc(processMouse);
 	InitGL();
-	//glutDisplayFunc(disp);
-	//glutReshapeFunc(handleResize);
-	//glutMainLoop();
-	
 	int prevclock = 0;
 	int curclock = 0;
 	handleResize(640,480);
+	SDL_Joystick *joystick;
+	SDL_JoystickEventState(SDL_ENABLE);
+	joystick = SDL_JoystickOpen(0);
 	while(running) {
-		checkevents();
-		processJoystiq();
-		disp();
+		curclock = clock();
+		if (curclock - prevclock > 17) {
+			checkevents();	
+			processMovement();
+			disp();
+		}	
 	}
-	//SDL_Quit();
+	SDL_Quit();
 	return 0;
 }

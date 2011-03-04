@@ -9,6 +9,3 @@ Original hardcoded properties, will eventually be customizable from a menu
 	SDLKey moveright = SDLK_RIGHT;
 	SDLKey reset = SDLK_HOME;
 
-
-	int conx = 0;
-	int cony = 0;
