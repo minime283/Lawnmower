@@ -4,9 +4,9 @@
 //Method for position of grass, and if the grass has been cut
 void growGrass(){
 	int x,y;
-	for(x=0;x<=fieldsize;x++) {
-		for(y=0;y<=fieldsize;y++) {
-			grasscut[x][y] = 0;
+	for(x=0;x<=GrassField::fieldsize;x++) {
+		for(y=0;y<=GrassField::fieldsize;y++) {
+			GrassField::grasscut[x][y] = 0;
 		}
 	}
 }
@@ -72,9 +72,12 @@ void drawCube(int size){
 			glVertex3f(plane,0,size);
 		glEnd();
 		
-		glGetFloatv(GL_CURRENT_COLOR,curColor);
-		glLineWidth(3.0f);
-		glColor3f(0,0,0);
+		//glMatrixMode(GL_COLOR);
+		//glPushMatrix();
+		//glMatrixMode(GL_MODELVIEW);
+		//glGetFloatv(GL_CURRENT_COLOR,curColor);
+		//glLineWidth(3.0f);
+		/*glColor3f(0,0,0);
 		glBegin(GL_LINES);
 			glVertex3f(0,0,plane );
 			glVertex3f(size,0,plane);
@@ -114,15 +117,18 @@ void drawCube(int size){
 			glVertex3f(plane,0,size);
 			glVertex3f(plane,0,0);
 
-		glEnd();
-		glColor4fv(curColor);
+		glEnd();*/
+		//glMatrixMode(GL_COLOR);
+		//glPopMatrix();
+		//glMatrixMode(GL_MODELVIEW);
+		//glColor4fv(curColor);
 	}
 }
 
 
 void handleResize(int width, int height)
 {
-	glViewport(0.0,0.0,width,height);
+	glViewport(0.0,0.0,width/2,height/2);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(45.0f,(double)width / (double)height,1.0f,50.0f);
@@ -139,8 +145,8 @@ void landscape(){
 	//this allows the randomness of the field to NOT change on every render
 	srand(245);
 	//Like in the 3d Checkerboard cube we use 2 for loops
-	for ( x = 0.0; x <= fieldsize; x += 1 ) {
-	 for ( y = 0.0; y <= fieldsize; y += 1 ) {
+	for ( x = 0.0; x <= GrassField::fieldsize; x += 1 ) {
+	 for ( y = 0.0; y <= GrassField::fieldsize; y += 1 ) {
 		glColor4f(1.0f,1.0f,1.0f,1.0f);
 		glEnable(GL_TEXTURE_2D); //Enable 2D texturing
 		//Bind texture to the following polygons
@@ -199,7 +205,7 @@ void landscape(){
 				float randomnumber = (float)rand()/(float)RAND_MAX;
 				//this random number determines how long the grass will show for this particular blade
 				float randomnumber2 = (float)rand()/(float)RAND_MAX;
-				if (grasscut[(int)x][(int)y] == 0 && randomnumber < 0.75) {
+				if (GrassField::grasscut[(int)x][(int)y] == 0 && randomnumber < 0.75) {
 						glColor3f(0.0f,1.0f,0.0f);
 						//one triangle polygon to represent grass
 						glBegin(GL_POLYGON);					
@@ -283,15 +289,16 @@ int main(int argc, char** argv)
 	SDL_JoystickEventState(SDL_ENABLE);
 	joystick = SDL_JoystickOpen(0);
 	Mower* mowers[2];
-	mowers[0] = new Mower(SDLK_UP,SDLK_DOWN,SDLK_LEFT,SDLK_RIGHT);
+	
+	//mowers[0] = new Mower(SDLK_UP,SDLK_DOWN,SDLK_LEFT,SDLK_RIGHT);
 	//mowers[1] = new Mower(SDLK_w,SDLK_s,SDLK_a,SDLK_d);
+	Mower::makeMower(0);
+	Mower::makeMower(1);
 	while(running) {
 		curclock = clock();
-		if (curclock - prevclock > 17) {
+		if (curclock - prevclock > 126) {
 			checkevents();
-			for(int i=0;i<=0;i++) {
-				mowers[i]->processMovement();
-			}
+			Mower::processMovementAll();
 			disp();
 		}	
 	}

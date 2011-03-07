@@ -82,6 +82,7 @@
     <ClCompile Include="mower.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="grassfield.h" />
     <ClInclude Include="lawnmower.h" />
     <ClInclude Include="mower.h" />
     <ClInclude Include="properties.h" />

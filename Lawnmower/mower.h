@@ -1,5 +1,6 @@
 #ifndef MOWER_H
 #define MOWER_H
+#include "grassfield.h"
 #include "SDL.h"
 #include "SDL_opengl.h"
 #include "SDL_joystick.h"
@@ -16,14 +17,14 @@ private:
 	GLfloat lup;
 	GLfloat lright;
 	GLfloat lrotation;
-	
-	void init()
+	MowerSettings settings;
+	void init(int index)
 	{
-		Mower::mowers[Mower::count] = this;
 		modelid = glGenLists(1);
-		initModel();
+		settings = msettings[index];
 		Mower::count++;
-		
+		initModel();
+		score = 0;
 		conx = 0.0f;
 		cony = 0.0f;
 		lup = 0.0f;
@@ -31,6 +32,7 @@ private:
 		lrotation =0.0f;
 	}
 	int score;
+	int index;
 	SDLKey kup;
 	SDLKey kdown;
 	SDLKey kleft;
@@ -47,7 +49,9 @@ protected:
 	void handleKeyboardDown(SDL_KeyboardEvent Event);
 	void handleJoystickAxis(SDL_JoyAxisEvent Event);
 public:
-	
+	Mower()
+	{
+	}
 static void Mower::keyboardUp(SDL_KeyboardEvent Event)
 {
 	for(int i=0; i <= Mower::count -1; i ++) {
@@ -67,6 +71,18 @@ static void Mower::joystickAxis(SDL_JoyAxisEvent Event)
 		Mower::mowers[i]->handleJoystickAxis(Event);
 	}
 }
+static void Mower::processMovementAll()
+{
+	for(int i=0; i <= Mower::count -1; i ++) {
+		Mower::mowers[i]->processMovement();
+	}
+}
+static void Mower::makeMower(int index)
+{
+	Mower::mowers[index] = new Mower();
+	Mower::mowers[index]->init(index);
+	
+}
 static void Mower::drawAll()
 {
 	for(int i=0; i <= Mower::count -1; i++) {
@@ -74,9 +90,10 @@ static void Mower::drawAll()
 	}
 }
 	void processMovement();
+	
 	Mower(SDLKey up, SDLKey down, SDLKey left, SDLKey right)
 	{
-		init();
+		init(1);
 		kup = up;
 		kdown = down;
 		kleft = left;
@@ -84,7 +101,7 @@ static void Mower::drawAll()
 	}
 	Mower(int axisx, int axisy, int joystick_id)
 	{
-		init();
+		init(1);
 		jaxisy = axisy;
 		jaxisx = axisx;
 		jid = joystick_id;		

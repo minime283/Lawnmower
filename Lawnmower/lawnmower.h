@@ -2,6 +2,7 @@
 #define LAWNMOWER_H
 #define CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
+#include "grassfield.h"
 #include <iostream>
 #include <cstdlib>
 #include <windows.h>
@@ -31,7 +32,7 @@ static GLfloat transZ = -25.0; // Translate around the Z axis
 static GLfloat scaleX = 1.0; //Scale X
 static GLfloat scaleY = 1.0; //Scale Y
 static GLfloat curColor[4]; //color
-const int fieldsize = 16; //Static Size of Field fieldsize X fieldsize
+
 // container for texture arrays
 static GLuint side_texture; 
 static GLuint ttop_texture;
@@ -41,7 +42,7 @@ static int cut_texture;
 //ctexture test;
 static bool running = true;
 //2D array for developing grass
-static int grasscut[fieldsize+1][fieldsize+1];
+
 
 
 //Method for position of grass, and if the grass has been cut

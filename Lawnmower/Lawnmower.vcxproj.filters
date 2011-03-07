@@ -32,5 +32,8 @@
     <ClInclude Include="mower.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="grassfield.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

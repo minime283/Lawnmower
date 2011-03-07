@@ -3,6 +3,8 @@
 #include "lawnmower.h"
 Mower* Mower::mowers[4];
 int Mower::count;
+//const int GrassField::fieldsize; //Static Size of Field fieldsize X fieldsize
+int GrassField::grasscut[GrassField::fieldsize+1][GrassField::fieldsize+1];
 void Mower::processMovement(){
 	this->lup += this->cony;
 	this->lright += this->conx;
@@ -42,16 +44,16 @@ void Mower::checkCollision()
 	if(lup < 0) {
 		lup = 0;
 	}
-	if(lright > fieldsize) {
-		lright = fieldsize;
+	if(lright > GrassField::fieldsize) {
+		lright = GrassField::fieldsize;
 	}
-	if(lup > fieldsize) {
-		lup = fieldsize;
+	if(lup > GrassField::fieldsize) {
+		lup = GrassField::fieldsize;
 	}
-	grasscut[(int)lright][(int)lup] = 1;
-	if(grasscut[(int)lright][(int)lup] == 0 ) {
+	GrassField::grasscut[(int)lright][(int)lup] = 1;
+	if(GrassField::grasscut[(int)lright][(int)lup] == 0 ) {
 		score++;
-		grasscut[(int)lright][(int)lup] = 1;
+		GrassField::grasscut[(int)lright][(int)lup] = 1;
 	} else {
 	}
 }
@@ -82,14 +84,14 @@ void Mower::initModel(){
 	glRotatef(90,1,0,0);
 	glTranslatef(0,0,9);
 	//draw the center rectangle
-	glColor3f(0.0,1.0,0.0);	
+	glColor4fv(settings.squarecol);	
 	glPushMatrix();
 		glScalef(1.0f,1.4f,0.6f);		
 		glTranslatef(0.0f,0.0f,5.0f);
 		drawCube(8);
 	glPopMatrix();
 	//draw the inner rectangle
-	glColor3f(1.0,0.0,0.0);
+	glColor4fv(settings.motorcol);
 	glTranslatef(2,2,6);
 	drawCube(4);
 
@@ -108,7 +110,7 @@ void Mower::initModel(){
 	glPopMatrix();
 	//draw the handles
 	glPushMatrix();
-		glColor3f(0.0,0.0,1.0);
+		glColor4fv(settings.handlecol);
 		glRotatef(45,1,0,0);
 		glTranslatef(-1.0,0.0f,-2.0f);
 		glScalef(1,20,1);
@@ -127,13 +129,13 @@ void Mower::initModel(){
 
 void Mower::handleKeyboardUp(SDL_KeyboardEvent Event)
 {
-	if (Event.keysym.sym == kup)
+	if (Event.keysym.sym == settings.moveup)
 		cony += 0.5;
-	else if(Event.keysym.sym == kdown)
+	else if(Event.keysym.sym == settings.movedown)
 		cony -= 0.5;
-	else if (Event.keysym.sym == kleft)
+	else if (Event.keysym.sym == settings.moveleft)
 		conx += 0.5;
-	else if (Event.keysym.sym == kright)
+	else if (Event.keysym.sym == settings.moveright)
 		conx -= 0.5;
 
 	//if(Event.keysym.sym == reset) {
@@ -143,14 +145,14 @@ void Mower::handleKeyboardUp(SDL_KeyboardEvent Event)
 
 void Mower::handleKeyboardDown(SDL_KeyboardEvent Event)
 {
-	if (Event.keysym.sym == this->kdown)
+	if (Event.keysym.sym == this->settings.movedown)
 		this->cony += 0.5;
-	if (Event.keysym.sym == this->kup)
+	if (Event.keysym.sym == this->settings.moveup)
 		this->cony -= 0.5;
 
-	if (Event.keysym.sym == this->kleft)
+	if (Event.keysym.sym == this->settings.moveleft)
 		this->conx -= 0.5;
-	if (Event.keysym.sym == this->kright)
+	if (Event.keysym.sym == this->settings.moveright)
 		this->conx += 0.5;
 }
 
