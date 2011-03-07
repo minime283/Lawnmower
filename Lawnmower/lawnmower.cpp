@@ -1,3 +1,5 @@
+#ifndef LAWNMOWER_CPP
+#define LAWNMOWER_CPP
 #include "lawnmower.h"
 //Method for position of grass, and if the grass has been cut
 void growGrass(){
@@ -30,8 +32,8 @@ void InitGL(){
 	SDL_FreeSurface(sur);
 	
 	sur = SDL_LoadBMP("../Assets/top.bmp");
-	glGenTextures(1, &top_texture);
-	glBindTexture( GL_TEXTURE_2D, top_texture );
+	glGenTextures(1, &ttop_texture);
+	glBindTexture( GL_TEXTURE_2D, ttop_texture );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	glTexImage2D(GL_TEXTURE_2D,0,sur->format->BytesPerPixel,sur->w,sur->h,0,GL_RGB,GL_UNSIGNED_BYTE,sur->pixels);
@@ -116,61 +118,7 @@ void drawCube(int size){
 		glColor4fv(curColor);
 	}
 }
-//Draws the lawnmower
-void lawnmower(){
-	int j=0;
-	float x = 0;
-	float y = 0;
-	float z= 0;
-	float plane = 0;
-	glPushMatrix();
-	//fix the orientation of the lawnmower
-	glScalef(1.0,-1.0,1.0);
-	glRotatef(90,1,0,0);
-	glTranslatef(0,0,9);
-	//draw the center rectangle
-	glColor3f(0.0,1.0,0.0);	
-	glPushMatrix();
-		glScalef(1.0f,1.4f,0.6f);		
-		glTranslatef(0.0f,0.0f,5.0f);
-		drawCube(8);
-	glPopMatrix();
-	//draw the inner rectangle
-	glColor3f(1.0,0.0,0.0);
-	glTranslatef(2,2,6);
-	drawCube(4);
 
-	//draw the four wheels
-	glPushMatrix();
-		glColor3f(0,0,0);
-		glRotatef(90,0,1,0);
-		glTranslatef(1.9f,0.6f,6.2f);
-		//glutSolidTorus(0.7, 1.5, 10, 10);
-		glTranslatef(0.0f,6.0f,0);
-		//glutSolidTorus(0.7, 1.5, 10, 10);
-		glTranslatef(0.0f,0.0f,-8.0f);
-		//glutSolidTorus(0.7, 1.5, 10, 10);
-		glTranslatef(0.0f,-6.0f,0);
-		//glutSolidTorus(0.7, 1.5, 10, 10);
-	glPopMatrix();
-	//draw the handles
-	glPushMatrix();
-		glColor3f(0.0,0.0,1.0);
-		glRotatef(45,1,0,0);
-		glTranslatef(-1.0,0.0f,-2.0f);
-		glScalef(1,20,1);
-		drawCube(1);
-		glTranslatef(5.0f,0.0f,0.0f);
-		drawCube(1);
-		glTranslatef(-5.0f,1.0f,0.0f);
-		glScalef(6.0f,1.0f/20.0f,1.0f);
-		drawCube(1);
-	glPopMatrix();
-
-	glPopMatrix();
-	
-
-}
 
 void handleResize(int width, int height)
 {
@@ -232,7 +180,7 @@ void landscape(){
 			glTexCoord2f(0 , 0);		glVertex3f(x+1, 0, y+1);
 		glEnd();
 
-		glBindTexture (GL_TEXTURE_2D, top_texture); //Final texture to be bound
+		glBindTexture (GL_TEXTURE_2D, ttop_texture); //Final texture to be bound
 		glBegin(GL_QUADS);
 			//This is the top face
 			glTexCoord2f(0 , 1);		glVertex3f(x, 1, y+1);
@@ -281,109 +229,22 @@ void disp(){
 		glTranslatef((transX),(transY),transZ); // Translate on X
 		
 		landscape();//Draw Landscape and Grass
-
-		glTranslatef(lawnmowerright,0,lawnmowerup);
-		glScalef(0.1,0.1,0.1);
-		glTranslatef(4.0f,0,4.0f);
-		glRotatef(lawnmowerrotation,0,1,0);
-		glTranslatef(-4.0f,0,-4.0f);
-		lawnmower(); //Draw Lawnmower
+		//glTranslatef(0,0,0);
+		//glScalef(0.1,0.1,0.1);
+		//glTranslatef(4.0f,0,4.0f);
+		//glRotatef(0,0,1,0);
+		//glTranslatef(-4.0f,0,-4.0f);
+		//drawModel(); //Draw Lawnmower
+	Mower::drawAll();
+		
 	SDL_GL_SwapBuffers();
 }
 
-void checkCollision()
-{
-	if(lawnmowerright < 0) {
-		lawnmowerright = 0;
-	}
-	if(lawnmowerup < 0) {
-		lawnmowerup = 0;
-	}
-	if(lawnmowerright > fieldsize) {
-		lawnmowerright = fieldsize;
-	}
-	if(lawnmowerup > fieldsize) {
-		lawnmowerup = fieldsize;
-	}
-	grasscut[(int)lawnmowerright][(int)lawnmowerup] = 1;
-}
 
-void processMovement(){
-	lawnmowerup += cony;
-	lawnmowerright += conx;
-	//this rotation stuff is necessary
-	if (conx != 0 || cony != 0) {
 
-		if (conx == 0) {
-			if (cony > 0) {
-				lawnmowerrotation = 180;
-			} else {
-				lawnmowerrotation = 0;
-			}
-		} else if (cony == 0) {
-			if (conx > 0) {
-				lawnmowerrotation = 270;
-			} else {
-				lawnmowerrotation = 90;
-			}
-		} else {
-			//some combination of both
-			lawnmowerrotation = atan((double)conx/cony) * 180/3.1415926;
-			if (cony > 0) {
-				lawnmowerrotation += 180;
-			}
-		}
-	}
-	rotX += conrotx;
-	rotY += conroty;
-	checkCollision();
-}
 
-void handleKeyboardUp(SDL_KeyboardEvent Event)
-{
-	if (Event.keysym.sym == moveup)
-		cony += 0.5;
-	else if(Event.keysym.sym == movedown)
-		cony -= 0.5;
-	else if (Event.keysym.sym == moveleft)
-		conx += 0.5;
-	else if (Event.keysym.sym == moveright)
-		conx -= 0.5;
 
-	if(Event.keysym.sym == reset) {
-		growGrass();	
-	}
-}
 
-void handleKeyboardDown(SDL_KeyboardEvent Event)
-{
-	if (Event.keysym.sym == movedown)
-		cony += 0.5;
-	if (Event.keysym.sym == moveup)
-		cony -= 0.5;
-
-	if (Event.keysym.sym == moveleft)
-		conx -= 0.5;
-	if (Event.keysym.sym == moveright)
-		conx += 0.5;
-}
-
-void handleJoystickAxis(SDL_JoyAxisEvent Event)
-{
-	if (Event.axis == 0) {
-		conx = Event.value /60000.0f;
-		if(abs(conx) < 0.125) {conx = 0;}
-	} else if(Event.axis == 1) {
-		cony = Event.value /60000.0f;
-		if(abs(cony) < 0.125) {cony = 0;}
-	} else if(Event.axis == 3) {
-		conrotx = Event.value / 60000.0f;
-		if(abs(conrotx) < 0.125) {conrotx = 0;}
-	} else if(Event.axis == 4) {
-		conroty = Event.value / 60000.0f;
-		if(abs(conroty) < 0.125) {conroty = 0;}
-	}
-}
 
 
 void checkevents()
@@ -397,14 +258,14 @@ void checkevents()
 			case SDL_VIDEORESIZE:
 				handleResize(Event.resize.w,Event.resize.h);
 				break;								
-			case SDL_KEYDOWN:
-				handleKeyboardDown(Event.key);
+			case SDL_KEYDOWN:			
+				Mower::keyboardDown(Event.key);
 				break;
 			case SDL_KEYUP:
-				handleKeyboardUp(Event.key);
+				Mower::keyboardUp(Event.key);
 				break;
 			case SDL_JOYAXISMOTION:
-				handleJoystickAxis(Event.jaxis);
+				Mower::joystickAxis(Event.jaxis);
 				break;
 		}
 	}
@@ -412,9 +273,8 @@ void checkevents()
 }
 int main(int argc, char** argv)
 {
-
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
-	SDL_Surface* screen = SDL_SetVideoMode(640,480,16,SDL_OPENGL |SDL_DOUBLEBUF|SDL_HWSURFACE |SDL_RESIZABLE);
+	SDL_Surface* screen = SDL_SetVideoMode(640,480,16,SDL_OPENGL |SDL_DOUBLEBUF|SDL_ANYFORMAT |SDL_RESIZABLE);
 	InitGL();
 	int prevclock = 0;
 	int curclock = 0;
@@ -422,14 +282,20 @@ int main(int argc, char** argv)
 	SDL_Joystick *joystick;
 	SDL_JoystickEventState(SDL_ENABLE);
 	joystick = SDL_JoystickOpen(0);
+	Mower* mowers[2];
+	mowers[0] = new Mower(SDLK_UP,SDLK_DOWN,SDLK_LEFT,SDLK_RIGHT);
+	//mowers[1] = new Mower(SDLK_w,SDLK_s,SDLK_a,SDLK_d);
 	while(running) {
 		curclock = clock();
 		if (curclock - prevclock > 17) {
-			checkevents();	
-			processMovement();
+			checkevents();
+			for(int i=0;i<=0;i++) {
+				mowers[i]->processMovement();
+			}
 			disp();
 		}	
 	}
 	SDL_Quit();
 	return 0;
 }
+#endif
