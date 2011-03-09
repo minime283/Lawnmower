@@ -52,6 +52,22 @@ public:
 	Mower()
 	{
 	}
+	static int getCount()
+	{
+		return Mower::count;
+	}
+	static Mower* getMower(int index)
+	{
+		return Mower::mowers[index];
+	}
+	GLfloat getUp()
+	{
+		return this->lup;
+	}
+	GLfloat getRight()
+	{
+		return this->lright;
+	}
 static void Mower::keyboardUp(SDL_KeyboardEvent Event)
 {
 	for(int i=0; i <= Mower::count -1; i ++) {

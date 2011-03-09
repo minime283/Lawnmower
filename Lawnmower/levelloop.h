@@ -1,0 +1,3 @@
+class LevelLoop extends GameModeLoop {
+	
+};

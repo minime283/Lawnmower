@@ -71,67 +71,19 @@ void drawCube(int size){
 			glVertex3f(plane,size,size);
 			glVertex3f(plane,0,size);
 		glEnd();
-		
-		//glMatrixMode(GL_COLOR);
-		//glPushMatrix();
-		//glMatrixMode(GL_MODELVIEW);
-		//glGetFloatv(GL_CURRENT_COLOR,curColor);
-		//glLineWidth(3.0f);
-		/*glColor3f(0,0,0);
-		glBegin(GL_LINES);
-			glVertex3f(0,0,plane );
-			glVertex3f(size,0,plane);
-			
-			glVertex3f(size,0,plane);
-			glVertex3f(size,size,plane);
-
-			glVertex3f(size,size,plane);
-			glVertex3f(0,0+size,plane);
-
-			glVertex3f(0,0+size,plane);
-			glVertex3f(0,0,plane );
-		glEnd();
-		glBegin(GL_LINES);
-			glVertex3f(0,plane,0);
-			glVertex3f(size,plane,0);
-
-			glVertex3f(size,plane,0);
-			glVertex3f(size,plane,size);
-
-			glVertex3f(size,plane,size);
-			glVertex3f(0,plane,size);
-
-			glVertex3f(0,plane,size);
-			glVertex3f(0,plane,0);
-		glEnd();
-		glBegin(GL_LINES);
-			glVertex3f(plane,0,0);
-			glVertex3f(plane,size,0);
-
-			glVertex3f(plane,size,0);
-			glVertex3f(plane,size,size);
-
-			glVertex3f(plane,size,size);
-			glVertex3f(plane,0,size);
-
-			glVertex3f(plane,0,size);
-			glVertex3f(plane,0,0);
-
-		glEnd();*/
-		//glMatrixMode(GL_COLOR);
-		//glPopMatrix();
-		//glMatrixMode(GL_MODELVIEW);
-		//glColor4fv(curColor);
 	}
 }
 
 
 void handleResize(int width, int height)
 {
-	glViewport(0.0,0.0,width/2,height/2);
+	windowwidth = width;
+	windowheight = height;
+	glViewport(0.0,0.0,width,height);
+	
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(45.0f,(double)width / (double)height,1.0f,50.0f);
+	gluPerspective(45.0f,(double)width / (double)height ,1.0f,50.0f);
 }
 
 /*
@@ -222,9 +174,38 @@ void landscape(){
 }
 
 //setup the landscape/grass/lawnmower and draw it
-void disp(){
+void drawComplete()
+{
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
+	if (Mower::getCount() == 1) {
+		glViewport(0.0,0.0,windowwidth,windowheight);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(45.0f,(double)windowwidth / (double)windowheight ,1.0f,50.0f);	
+		disp();
+	} else if(Mower::getCount() == 2){
+		glViewport(0.0,0.0,windowwidth/2,windowheight);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glTranslatef(-Mower::getMower(0)->getRight()/100.0f,Mower::getMower(0)->getUp()/100.0f,0);
+		gluPerspective(45.0f,(double)windowwidth / (double)windowheight /2,1.0f,50.0f);	
+		//gluLookAt(eax,eay,eaz,cex,cey,cez,nx,ny,nz); //6,1,16,15,25,5,-1,-1,-1,
+		disp();
+		glViewport(windowwidth/2,0.0,windowwidth/2,windowheight);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glTranslatef(-Mower::getMower(1)->getRight()/100.0f,Mower::getMower(1)->getUp()/100.0f,0);
+		gluPerspective(45.0f,(double)windowwidth / (double)windowheight /2,1.0f,50.0f);	
+		disp();
+	} else {
+	
+	}
+		SDL_GL_SwapBuffers();
+}
+void disp(){
+	
+	//glViewport(0.0,0.0,windowwidth/2,windowheight);
+	
 	glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 		glTranslatef(0.0f,0.0f,-5.0f);
@@ -241,9 +222,22 @@ void disp(){
 		//glRotatef(0,0,1,0);
 		//glTranslatef(-4.0f,0,-4.0f);
 		//drawModel(); //Draw Lawnmower
-	Mower::drawAll();
-		
-	SDL_GL_SwapBuffers();
+		Mower::drawAll();
+	glLoadIdentity();
+	glBegin(GL_LINES);
+		glColor3f(1,0,0);
+		glVertex3f(0,0,0);
+		glVertex3f(0,0,100);
+		glColor3f(0,1,0);
+		glVertex3f(0,0,0);
+		glVertex3f(0,100,0);
+		glColor3f(0,0,1);
+		glVertex3f(0,0,0);
+		glVertex3f(100,0,0);
+
+	glEnd();
+	glMatrixMode(GL_MODELVIEW);
+
 }
 
 
@@ -264,7 +258,7 @@ void checkevents()
 			case SDL_VIDEORESIZE:
 				handleResize(Event.resize.w,Event.resize.h);
 				break;								
-			case SDL_KEYDOWN:			
+			case SDL_KEYDOWN:
 				Mower::keyboardDown(Event.key);
 				break;
 			case SDL_KEYUP:
@@ -288,18 +282,17 @@ int main(int argc, char** argv)
 	SDL_Joystick *joystick;
 	SDL_JoystickEventState(SDL_ENABLE);
 	joystick = SDL_JoystickOpen(0);
-	Mower* mowers[2];
 	
-	//mowers[0] = new Mower(SDLK_UP,SDLK_DOWN,SDLK_LEFT,SDLK_RIGHT);
-	//mowers[1] = new Mower(SDLK_w,SDLK_s,SDLK_a,SDLK_d);
+	Mower* mowers[2];
 	Mower::makeMower(0);
 	Mower::makeMower(1);
+	//Mower::makeMower(1);
 	while(running) {
 		curclock = clock();
 		if (curclock - prevclock > 126) {
 			checkevents();
 			Mower::processMovementAll();
-			disp();
+			drawComplete();
 		}	
 	}
 	SDL_Quit();
