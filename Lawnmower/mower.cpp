@@ -4,29 +4,33 @@
 Mower* Mower::mowers[4];
 int Mower::count;
 //const int GrassField::fieldsize; //Static Size of Field fieldsize X fieldsize
-int GrassField::grasscut[GrassField::fieldsize+1][GrassField::fieldsize+1];
+//int GrassField::grasscut[GrassField::fieldsize+1][GrassField::fieldsize+1];
 void Mower::processMovement(){
-	this->lup += this->cony;
-	this->lright += this->conx;
+	int curclock = clock();
+	//Process Accelleration
+	
+	//Process Velocity
+	this->lup += (curclock - this->last_update ) / 10 * this->vely;
+	this->lright += (curclock - this->last_update) / 10 * this->velx;
 	//this rotation stuff is necessary
-	if (conx != 0 || cony != 0) {
+	if (velx != 0 || vely != 0) {
 
-		if (conx == 0) {
-			if (cony > 0) {
+		if (velx == 0) {
+			if (vely > 0) {
 				lrotation = 180;
 			} else {
 				lrotation = 0;
 			}
-		} else if (cony == 0) {
-			if (conx > 0) {
+		} else if (vely == 0) {
+			if (velx > 0) {
 				lrotation = 270;
 			} else {
 				lrotation = 90;
 			}
 		} else {
 			//some combination of both
-			lrotation = atan((double)conx/cony) * 180/3.1415926;
-			if (cony > 0) {
+			lrotation = atan((double)velx/vely) * 180/3.1415926;
+			if (vely > 0) {
 				lrotation += 180;
 			}
 		}
@@ -34,6 +38,59 @@ void Mower::processMovement(){
 	//rotX += conrotx;
 	//rotY += conroty;
 	checkCollision();
+	this->last_update = curclock;
+}
+
+//draws a 1x1 cube. Lawnmower is drawn entirely of these cubes (not including the wheels) (extorted of course)
+void drawCube(int size){
+	float plane=0;
+	for(plane=0;plane<=size;plane+=size) {
+		glBegin(GL_POLYGON);
+			glVertex3f(0,0,plane );
+			glVertex3f(size,0,plane);
+			glVertex3f(size,size,plane);
+			glVertex3f(0,0+size,plane);
+		glEnd();
+
+		glBegin(GL_POLYGON);
+			glVertex3f(0,plane,0);
+			glVertex3f(size,plane,0);
+			glVertex3f(size,plane,size);
+			glVertex3f(0,plane,size);
+		glEnd();
+		
+		glBegin(GL_POLYGON);
+			glVertex3f(plane,0,0);
+			glVertex3f(plane,size,0);
+			glVertex3f(plane,size,size);
+			glVertex3f(plane,0,size);
+		glEnd();
+	}
+}//draws a 1x1 cube. Lawnmower is drawn entirely of these cubes (not including the wheels) (extorted of course)
+void Mower::drawCube(int size){
+	float plane=0;
+	for(plane=0;plane<=size;plane+=size) {
+		glBegin(GL_POLYGON);
+			glVertex3f(0,0,plane );
+			glVertex3f(size,0,plane);
+			glVertex3f(size,size,plane);
+			glVertex3f(0,0+size,plane);
+		glEnd();
+
+		glBegin(GL_POLYGON);
+			glVertex3f(0,plane,0);
+			glVertex3f(size,plane,0);
+			glVertex3f(size,plane,size);
+			glVertex3f(0,plane,size);
+		glEnd();
+		
+		glBegin(GL_POLYGON);
+			glVertex3f(plane,0,0);
+			glVertex3f(plane,size,0);
+			glVertex3f(plane,size,size);
+			glVertex3f(plane,0,size);
+		glEnd();
+	}
 }
 
 void Mower::checkCollision()
@@ -44,16 +101,15 @@ void Mower::checkCollision()
 	if(lup < 0) {
 		lup = 0;
 	}
-	if(lright > GrassField::fieldsize) {
-		lright = GrassField::fieldsize;
+	if(lright > field->getFieldSize()) {
+		lright = field->getFieldSize();
 	}
-	if(lup > GrassField::fieldsize) {
-		lup = GrassField::fieldsize;
+	if(lup > field->getFieldSize()) {
+		lup = field->getFieldSize();
 	}
-	GrassField::grasscut[(int)lright][(int)lup] = 1;
-	if(GrassField::grasscut[(int)lright][(int)lup] == 0 ) {
+	if(field->isGrassCut((int)lright,(int)lup) == false ) {
 		score++;
-		GrassField::grasscut[(int)lright][(int)lup] = 1;
+		field->cutGrass((int)lright,(int)lup);
 	} else {
 	}
 }
@@ -130,13 +186,13 @@ void Mower::initModel(){
 void Mower::handleKeyboardUp(SDL_KeyboardEvent Event)
 {
 	if (Event.keysym.sym == settings.moveup)
-		cony += 0.5;
+		vely += 0.5;
 	else if(Event.keysym.sym == settings.movedown)
-		cony -= 0.5;
+		vely -= 0.5;
 	else if (Event.keysym.sym == settings.moveleft)
-		conx += 0.5;
+		velx += 0.5;
 	else if (Event.keysym.sym == settings.moveright)
-		conx -= 0.5;
+		velx -= 0.5;
 
 	//if(Event.keysym.sym == reset) {
 	//	growGrass();	
@@ -146,24 +202,24 @@ void Mower::handleKeyboardUp(SDL_KeyboardEvent Event)
 void Mower::handleKeyboardDown(SDL_KeyboardEvent Event)
 {
 	if (Event.keysym.sym == this->settings.movedown)
-		this->cony += 0.5;
+		this->vely += 0.5;
 	if (Event.keysym.sym == this->settings.moveup)
-		this->cony -= 0.5;
+		this->vely -= 0.5;
 
 	if (Event.keysym.sym == this->settings.moveleft)
-		this->conx -= 0.5;
+		this->velx -= 0.5;
 	if (Event.keysym.sym == this->settings.moveright)
-		this->conx += 0.5;
+		this->velx += 0.5;
 }
 
 void Mower::handleJoystickAxis(SDL_JoyAxisEvent Event)
 {	
 	if (Event.axis == 0) {
-		conx = Event.value /60000.0f;
-		if(abs(conx) < 0.125) {conx = 0;}
+		velx = Event.value /60000.0f;
+		if(abs(velx) < 0.125) {velx = 0;}
 	} else if(Event.axis == 1) {
-		cony = Event.value /60000.0f;
-		if(abs(cony) < 0.125) {cony = 0;}
+		vely = Event.value /60000.0f;
+		if(abs(vely) < 0.125) {vely = 0;}
 	} else if(Event.axis == 3) {
 		conrotx = Event.value / 60000.0f;
 		if(abs(conrotx) < 0.125) {conrotx = 0;}
@@ -175,3 +231,41 @@ void Mower::handleJoystickAxis(SDL_JoyAxisEvent Event)
 
 
 #endif
+
+MowerSettings Mower::msettings[4] =
+{{
+	SDLK_UP,
+	SDLK_DOWN,
+	SDLK_LEFT,
+	SDLK_RIGHT,
+	{ 0,0,1,1 },
+	{0,1,0,1},
+	{1,0,0,1}
+},
+{
+	SDLK_w,
+	SDLK_s,
+	SDLK_a,
+	SDLK_d,
+	{0,1,1,1},
+	{1,1,0,1},
+	{1,0,1,1}
+},
+{
+	SDLK_UP,
+	SDLK_DOWN,
+	SDLK_LEFT,
+	SDLK_RIGHT,
+	{ 0,0,1,1 },
+	{0,1,0,1},
+	{1,0,0,1},
+},
+{
+	SDLK_UP,
+	SDLK_DOWN,
+	SDLK_LEFT,
+	SDLK_RIGHT,
+	{ 0,0,1,1 },
+	{0,1,0,1},
+	{1,0,0,1},
+	}};

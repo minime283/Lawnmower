@@ -78,12 +78,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="grassfield.cpp" />
     <ClCompile Include="lawnmower.cpp" />
+    <ClCompile Include="levelloop.cpp" />
     <ClCompile Include="mower.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GameModeLoop.h" />
     <ClInclude Include="grassfield.h" />
     <ClInclude Include="lawnmower.h" />
+    <ClInclude Include="levelloop.h" />
     <ClInclude Include="mower.h" />
     <ClInclude Include="properties.h" />
   </ItemGroup>

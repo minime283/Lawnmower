@@ -4,31 +4,39 @@
 #include "SDL.h"
 #include "SDL_opengl.h"
 #include "SDL_joystick.h"
+#include "properties.h"
 class Mower
 {
 private:
+	int last_update;
 	void checkCollision();
 	void drawModel();
 	void initModel();
+	void drawCube(int size);
+
 	//Moves the lawnmower after inputs taken
-	GLfloat conx;
-	GLfloat cony; 
+	GLfloat velx;
+	GLfloat vely; 
+	//GLfloat accx;
+	//GLfloat accy;
 	//Variables for lawnmower position
 	GLfloat lup;
 	GLfloat lright;
 	GLfloat lrotation;
 	MowerSettings settings;
+	GrassField* field;
 	void init(int index)
 	{
+		last_update = 0;
 		modelid = glGenLists(1);
 		settings = msettings[index];
 		Mower::count++;
 		initModel();
 		score = 0;
-		conx = 0.0f;
-		cony = 0.0f;
-		lup = 0.0f;
-		lright =0.0f;
+		velx = 0.0f;
+		vely = 0.0f;
+		lup = 5.0f;
+		lright =5.0f;
 		lrotation =0.0f;
 	}
 	int score;
@@ -41,25 +49,24 @@ private:
 	int jaxisx;
 	int jid;
 	int modelid;
+		static MowerSettings msettings[4];
 protected:
 	static Mower* mowers[4];
 	
 	static int count;
+
+public:
 	void handleKeyboardUp(SDL_KeyboardEvent Event);
 	void handleKeyboardDown(SDL_KeyboardEvent Event);
 	void handleJoystickAxis(SDL_JoyAxisEvent Event);
-public:
 	Mower()
 	{
 	}
-	static int getCount()
+	Mower(int index)
 	{
-		return Mower::count;
+		init(index);
 	}
-	static Mower* getMower(int index)
-	{
-		return Mower::mowers[index];
-	}
+
 	GLfloat getUp()
 	{
 		return this->lup;
@@ -68,43 +75,11 @@ public:
 	{
 		return this->lright;
 	}
-static void Mower::keyboardUp(SDL_KeyboardEvent Event)
-{
-	for(int i=0; i <= Mower::count -1; i ++) {
-		Mower::mowers[i]->handleKeyboardUp(Event);
-	}
-}
 
-static void Mower::keyboardDown(SDL_KeyboardEvent Event)
-{
-	for(int i=0; i <= Mower::count -1; i ++) {
-		Mower::mowers[i]->handleKeyboardDown(Event);
+	void setField(GrassField *field)
+	{
+		this->field = field;
 	}
-}
-static void Mower::joystickAxis(SDL_JoyAxisEvent Event)
-{
-	for(int i=0; i <= Mower::count -1; i ++) {
-		Mower::mowers[i]->handleJoystickAxis(Event);
-	}
-}
-static void Mower::processMovementAll()
-{
-	for(int i=0; i <= Mower::count -1; i ++) {
-		Mower::mowers[i]->processMovement();
-	}
-}
-static void Mower::makeMower(int index)
-{
-	Mower::mowers[index] = new Mower();
-	Mower::mowers[index]->init(index);
-	
-}
-static void Mower::drawAll()
-{
-	for(int i=0; i <= Mower::count -1; i++) {
-		Mower::mowers[i]->draw();
-	}
-}
 	void processMovement();
 	
 	Mower(SDLKey up, SDLKey down, SDLKey left, SDLKey right)

@@ -21,6 +21,12 @@
     <ClCompile Include="mower.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="levelloop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="grassfield.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lawnmower.h">
@@ -33,6 +39,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="grassfield.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameModeLoop.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="levelloop.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
