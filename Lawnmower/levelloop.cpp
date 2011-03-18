@@ -3,7 +3,7 @@ int GameModeLoop::windowwidth;
 int GameModeLoop::windowheight;
 void LevelLoop::init()
 {
-	field = new GrassField(16);
+	field = new GrassField(40);
 
 	for(int i = 0;i<=3;i++) {
 		if(mowers[i] != nullptr) {
@@ -92,58 +92,31 @@ void LevelLoop::render()
 		glViewport(0.0,0.0,windowwidth/2,windowheight);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glTranslatef(-mowers[0]->getRight()/100.0f,mowers[0]->getUp()/100.0f,0);
 		gluPerspective(45.0f,(double)windowwidth / (double)windowheight /2,1.0f,50.0f);	
-		//gluLookAt(eax,eay,eaz,cex,cey,cez,nx,ny,nz); //6,1,16,15,25,5,-1,-1,-1,
+		gluLookAt(-transX+mowers[0]->getRight(),-transY,-transZ+mowers[0]->getUp(),mowers[0]->getRight(),-mowers[0]->getUp(),0,0,2,0); //6,1,16,15,25,5,-1,-1,-1,
 		disp();
 		glViewport(windowwidth/2,0.0,windowwidth/2,windowheight);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glTranslatef(-mowers[1]->getRight()/100.0f,mowers[0]->getUp()/100.0f,0);
 		gluPerspective(45.0f,(double)windowwidth / (double)windowheight /2,1.0f,50.0f);	
+		gluLookAt(-transX+mowers[1]->getRight(),-transY,-transZ+mowers[1]->getUp(),mowers[1]->getRight(),-mowers[1]->getUp(),0,0,2,0); //6,1,16,15,25,5,-1,-1,-1,
 		disp();
 	} else {
-	
+		//3 or 4 mowers
 	}
-		SDL_GL_SwapBuffers();
+	SDL_GL_SwapBuffers();
 }
 void LevelLoop::disp()
-{
-		//glViewport(0.0,0.0,windowwidth/2,windowheight);
-	
+{	
 	glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 		glTranslatef(0.0f,0.0f,-5.0f);
-		glRotatef(Yrot,1.0f,1.0f,0.0f);
-		glRotatef(rotX,1.0,0.0,0.0); // Rotate on X
-		glRotatef(rotY,0.0,1.0,0.0); // Rotate on Y
-		glRotatef(rotZ,0.0,0.0,1.0); // Rotate on Y
-		glTranslatef((transX),(transY),transZ); // Translate on X
 		field->render();
-		//landscape();//Draw Landscape and Grass
-		//glTranslatef(0,0,0);
-		//glScalef(0.1,0.1,0.1);
-		//glTranslatef(4.0f,0,4.0f);
-		//glRotatef(0,0,1,0);
-		//glTranslatef(-4.0f,0,-4.0f);
-		//drawModel(); //Draw Lawnmower
 		for(int i=0;i<=3;i++) {
 			if (mowers[i] != nullptr) {
 				mowers[i]->draw();
 			}
 		}
 	glLoadIdentity();
-	glBegin(GL_LINES);
-		glColor3f(1,0,0);
-		glVertex3f(0,0,0);
-		glVertex3f(0,0,100);
-		glColor3f(0,1,0);
-		glVertex3f(0,0,0);
-		glVertex3f(0,100,0);
-		glColor3f(0,0,1);
-		glVertex3f(0,0,0);
-		glVertex3f(100,0,0);
-
-	glEnd();
 	glMatrixMode(GL_MODELVIEW);
 }

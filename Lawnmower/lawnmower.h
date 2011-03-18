@@ -4,6 +4,8 @@
 #include <crtdbg.h>
 #include "grassfield.h"
 #include <iostream>
+#include <assert.h>
+
 #include <cstdlib>
 #include <windows.h>
 #include <ctime>
@@ -21,33 +23,18 @@
 
 using namespace std;
 
-static GLfloat conrotx = 0;
-static GLfloat conroty = 0;
+static GLfloat transX = -6.0; //Translate around the X axis
+static GLfloat transY = -11.0; // Translate around the Y axis
+static GLfloat transZ = -25.0; // Translate around the Z axis
 
-static GLfloat Yrot = 0.0f;
-
-static GLfloat eax=0;
-static GLfloat eay=0;
-static GLfloat eaz=5;
-static GLfloat cex=0;
-static GLfloat cey=0;
-static GLfloat cez=0;
-static GLfloat nx=0;
-static GLfloat ny=2;
-static GLfloat nz=0;
-static GLfloat rotX = 36.0f; // Rotate on the X Axis
-	static GLfloat rotY = 3.0f; // Rotate on the Y axis
-	static GLfloat rotZ = -4.0f; // Rotate around on the Z (based on degrees)
-	static GLfloat transX = -6.0; //Translate around the X axis
-	static GLfloat transY = -11.0; // Translate around the Y axis
-	static GLfloat transZ = -25.0; // Translate around the Z axis
-static GLfloat scaleX = 1.0; //Scale X
-static GLfloat scaleY = 1.0; //Scale Y
-static GLfloat curColor[4]; //color
-
-static bool running = true;
-//2D array for developing grass
+/**
+Run given Gameloop until loop exit
+@param GameModeLoop loop to run till exit
+**/
 void runGameLoop(GameModeLoop* myloop);
+/**
+Initalizes OpenGL
+**/
 void initGL();
 int main(int argc, char** argv);
 #endif

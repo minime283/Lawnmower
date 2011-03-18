@@ -8,15 +8,13 @@ void runGameLoop(GameModeLoop* myloop)
 	myloop->init();
 	while(myloop->isRunning()) {
 		curclock = clock();
-		if (curclock - prevclock > 126) {
-			
+		if (curclock - prevclock > 17) {
 			myloop->checkEvents();
 			myloop->simulation();
-
 		}	
 		myloop->interpolateState();
 		myloop->render();
-
+		prevclock = curclock;
 	}
 }
 void initGL()

@@ -3,18 +3,32 @@
 #include "lawnmower.h"
 Mower* Mower::mowers[4];
 int Mower::count;
-//const int GrassField::fieldsize; //Static Size of Field fieldsize X fieldsize
-//int GrassField::grasscut[GrassField::fieldsize+1][GrassField::fieldsize+1];
 void Mower::processMovement(){
 	int curclock = clock();
+	int timepassed = curclock - this->last_update;
+	this->last_update = curclock;
+	if (timepassed == 0) { return; }
 	//Process Accelleration
-	
-	//Process Velocity
-	this->lup += (curclock - this->last_update ) / 10 * this->vely;
-	this->lright += (curclock - this->last_update) / 10 * this->velx;
-	//this rotation stuff is necessary
+	this->velx *= pow(0.999,timepassed);
+	this->vely *= pow(0.999,timepassed);
+	for(int i =0; i<=timepassed;i++) {		
+		if (this->velx >= this->settings.maxvelocity) {
+			this->velx = this->settings.maxvelocity;
+		} else {
+			this->velx += this->accx / 1000;
+		}
+		if (this->vely >= this->settings.maxvelocity) {
+			this->vely = this->settings.maxvelocity;
+		} else {
+			this->vely += this->accy / 1000;
+		}
+		//Process Velocity
+		this->lup += this->vely / 10;
+		this->lright += this->velx / 10;
+		checkGrassCollision();
+	}
+		//this rotation stuff is necessary
 	if (velx != 0 || vely != 0) {
-
 		if (velx == 0) {
 			if (vely > 0) {
 				lrotation = 180;
@@ -35,10 +49,7 @@ void Mower::processMovement(){
 			}
 		}
 	}
-	//rotX += conrotx;
-	//rotY += conroty;
 	checkCollision();
-	this->last_update = curclock;
 }
 
 //draws a 1x1 cube. Lawnmower is drawn entirely of these cubes (not including the wheels) (extorted of course)
@@ -66,7 +77,7 @@ void drawCube(int size){
 			glVertex3f(plane,0,size);
 		glEnd();
 	}
-}//draws a 1x1 cube. Lawnmower is drawn entirely of these cubes (not including the wheels) (extorted of course)
+}
 void Mower::drawCube(int size){
 	float plane=0;
 	for(plane=0;plane<=size;plane+=size) {
@@ -92,26 +103,33 @@ void Mower::drawCube(int size){
 		glEnd();
 	}
 }
-
+void Mower::checkGrassCollision()
+{
+	if(field->isGrassCut((int)lright,(int)lup) == false ) {
+		score++;
+		field->cutGrass((int)lright,(int)lup);
+	}
+}
 void Mower::checkCollision()
 {
 	if(lright < 0) {
 		lright = 0;
+		this->velx = -this->velx * 0.3;
 	}
 	if(lup < 0) {
 		lup = 0;
+		this->vely = -this->vely * 0.3;
 	}
 	if(lright > field->getFieldSize()) {
 		lright = field->getFieldSize();
+		this->velx = -this->velx * 0.3;
 	}
 	if(lup > field->getFieldSize()) {
 		lup = field->getFieldSize();
+		this->vely = -this->vely * 0.3;
 	}
-	if(field->isGrassCut((int)lright,(int)lup) == false ) {
-		score++;
-		field->cutGrass((int)lright,(int)lup);
-	} else {
-	}
+	
+	
 }
 
 void Mower::draw()
@@ -186,13 +204,13 @@ void Mower::initModel(){
 void Mower::handleKeyboardUp(SDL_KeyboardEvent Event)
 {
 	if (Event.keysym.sym == settings.moveup)
-		vely += 0.5;
+		this->accy += this->settings.acceleration;
 	else if(Event.keysym.sym == settings.movedown)
-		vely -= 0.5;
+		this->accy -= this->settings.acceleration;
 	else if (Event.keysym.sym == settings.moveleft)
-		velx += 0.5;
+		this->accx += this->settings.acceleration;
 	else if (Event.keysym.sym == settings.moveright)
-		velx -= 0.5;
+		this->accx -= this->settings.acceleration;
 
 	//if(Event.keysym.sym == reset) {
 	//	growGrass();	
@@ -202,30 +220,24 @@ void Mower::handleKeyboardUp(SDL_KeyboardEvent Event)
 void Mower::handleKeyboardDown(SDL_KeyboardEvent Event)
 {
 	if (Event.keysym.sym == this->settings.movedown)
-		this->vely += 0.5;
+		this->accy += this->settings.acceleration;
 	if (Event.keysym.sym == this->settings.moveup)
-		this->vely -= 0.5;
+		this->accy -= this->settings.acceleration;
 
 	if (Event.keysym.sym == this->settings.moveleft)
-		this->velx -= 0.5;
+		this->accx -= this->settings.acceleration;
 	if (Event.keysym.sym == this->settings.moveright)
-		this->velx += 0.5;
+		this->accx += this->settings.acceleration;
 }
 
 void Mower::handleJoystickAxis(SDL_JoyAxisEvent Event)
 {	
 	if (Event.axis == 0) {
-		velx = Event.value /60000.0f;
+		this->accx = this->settings.acceleration /60000.0f;
 		if(abs(velx) < 0.125) {velx = 0;}
 	} else if(Event.axis == 1) {
-		vely = Event.value /60000.0f;
+		this->accy = this->settings.acceleration /60000.0f;
 		if(abs(vely) < 0.125) {vely = 0;}
-	} else if(Event.axis == 3) {
-		conrotx = Event.value / 60000.0f;
-		if(abs(conrotx) < 0.125) {conrotx = 0;}
-	} else if(Event.axis == 4) {
-		conroty = Event.value / 60000.0f;
-		if(abs(conroty) < 0.125) {conroty = 0;}
 	}
 }
 
@@ -240,7 +252,9 @@ MowerSettings Mower::msettings[4] =
 	SDLK_RIGHT,
 	{ 0,0,1,1 },
 	{0,1,0,1},
-	{1,0,0,1}
+	{1,0,0,1},
+	0.2,
+	0.5
 },
 {
 	SDLK_w,
@@ -249,7 +263,9 @@ MowerSettings Mower::msettings[4] =
 	SDLK_d,
 	{0,1,1,1},
 	{1,1,0,1},
-	{1,0,1,1}
+	{1,0,1,1},
+	0.2,
+	0.5
 },
 {
 	SDLK_UP,
@@ -259,6 +275,8 @@ MowerSettings Mower::msettings[4] =
 	{ 0,0,1,1 },
 	{0,1,0,1},
 	{1,0,0,1},
+	0.2,
+	0.5
 },
 {
 	SDLK_UP,
@@ -268,4 +286,6 @@ MowerSettings Mower::msettings[4] =
 	{ 0,0,1,1 },
 	{0,1,0,1},
 	{1,0,0,1},
-	}};
+	0.2,
+	0.5
+}};

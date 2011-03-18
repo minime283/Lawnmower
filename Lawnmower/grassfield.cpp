@@ -8,6 +8,7 @@ void GrassField::growGrass(){
 		}
 	}
 }
+
 void GrassField::buildModel(){
 	SDL_Surface* sur;
 	sur = SDL_LoadBMP("../Assets/side.bmp");
@@ -95,6 +96,7 @@ void GrassField::buildModel(){
 	}
 	glEndList();
 }
+
 void GrassField::render(){
 	GLfloat  x,y,gx,gy;
 	//seed the random function with an arbitrary constant (but still constant)
@@ -102,28 +104,31 @@ void GrassField::render(){
 	srand(245);
 	//Like in the 3d Checkerboard cube we use 2 for loops
 	glCallList(this->fmodelid);
+	glColor3f(0.0f,1.0f,0.0f);
+	glBegin(GL_TRIANGLES);					
+						
+	//int counter = 0;
 	for ( x = 0.0; x <= fieldsize; x += 1 ) {
 	 for ( y = 0.0; y <= fieldsize; y += 1 ) {
 		 for ( gx = x; gx <= x+1; gx+=0.1) {
 			for (gy = y; gy <= y+1; gy+=0.1) {
 				//unfortunately, these random numbers must be generated, even if the grass is already cut in that area
 				//this random number determines whether the grass will show up for this particular blade
-				float randomnumber = (float)rand()/(float)RAND_MAX;
+				//float randomnumber = (float)rand()/(float)RAND_MAX;
 				//this random number determines how long the grass will show for this particular blade
 				float randomnumber2 = (float)rand()/(float)RAND_MAX;
-				if (GrassField::grasscut[(int)x][(int)y] == 0 && randomnumber < 0.75) {
-						glColor3f(0.0f,1.0f,0.0f);
+				if (GrassField::grasscut[(int)x][(int)y] == 0 ) {
 						//one triangle polygon to represent grass
-						glBegin(GL_POLYGON);					
 							glVertex3f(gx+0.05,1.0,gy+0.05);
-							glVertex3f(gx+0.025, randomnumber2 * 1.55, gy+0.025);
+							glVertex3f(gx+0.025, 1.0 + randomnumber2 * 0.55, gy+0.025);
 							glVertex3f(gx, 1.0, gy);
-						glEnd();				
 				}
 			}
 		}
 	 }
 	}
+	glEnd();				
+
 }
 
 bool GrassField::isGrassCut(int x, int y) {
@@ -132,6 +137,7 @@ bool GrassField::isGrassCut(int x, int y) {
 	}
 	return false;
 }
+
 void GrassField::cutGrass(int x, int y) {
 	grasscut[x][y] = 1;
 }
