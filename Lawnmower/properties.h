@@ -15,6 +15,8 @@ struct MowerSettings
 	GLfloat motorcol[4];
 	float acceleration;
 	float maxvelocity;
+	float startup;
+	float startright;
 };
 
 

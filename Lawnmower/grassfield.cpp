@@ -110,8 +110,8 @@ void GrassField::render(){
 	//int counter = 0;
 	for ( x = 0.0; x <= fieldsize; x += 1 ) {
 	 for ( y = 0.0; y <= fieldsize; y += 1 ) {
-		 for ( gx = x; gx <= x+1; gx+=0.1) {
-			for (gy = y; gy <= y+1; gy+=0.1) {
+		 for ( gx = x; gx <= x+1; gx+=0.2) {
+			for (gy = y; gy <= y+1; gy+=0.2) {
 				//unfortunately, these random numbers must be generated, even if the grass is already cut in that area
 				//this random number determines whether the grass will show up for this particular blade
 				//float randomnumber = (float)rand()/(float)RAND_MAX;
@@ -140,4 +140,5 @@ bool GrassField::isGrassCut(int x, int y) {
 
 void GrassField::cutGrass(int x, int y) {
 	grasscut[x][y] = 1;
+	this->squaresremaining--;
 }

@@ -1,9 +1,11 @@
 #ifndef LEVELLOOP_H
 #define LEVELLOOP_H
-#include "lawnmower.h"
+#include "textdisplay.h"
 #include "gamemodeloop.h"
+#include "winloop.h"
 #include "mower.h"
 #include "SDL.h"
+#include <string>
 #include "SDL_opengl.h"
 #include "grassfield.h"
 /**
@@ -12,6 +14,7 @@ This game mode loop specifically is targeted in the Levelloop
 class LevelLoop : public GameModeLoop {
 public:
 	void init();
+	
 	void checkEvents();
 	void simulation();
 	void interpolateState();
@@ -50,7 +53,11 @@ private:
 	Each of the lawnmowers
 	**/
 	Mower* mowers[4];
+	TextDisplay* scores[4];
 	int count;
 	void handleResize(int width, int height);
+	static GLfloat transX; //Translate around the X axis
+	static GLfloat transY; // Translate around the Y axis
+	static GLfloat transZ; // Translate around the Z axis
 };
 #endif

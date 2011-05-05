@@ -13,39 +13,72 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Loops">
+      <UniqueIdentifier>{ca05ffc4-4a19-43bf-83bc-ce51696c865f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Loops">
+      <UniqueIdentifier>{bd72898c-c2fb-4d85-b289-a664d4b330a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects">
+      <UniqueIdentifier>{1b4a57cf-5244-438d-b2fe-88e65070ab29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects">
+      <UniqueIdentifier>{66294410-ceab-461d-9c2d-9a78b7f584b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Tools">
+      <UniqueIdentifier>{85fa1047-c1a4-445a-b386-09b005325a38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools">
+      <UniqueIdentifier>{08d99f69-8c5e-4afc-a280-0ee85535e866}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lawnmower.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="mower.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="GameModeLoop.cpp">
+      <Filter>Source Files\Loops</Filter>
+    </ClCompile>
+    <ClCompile Include="textdisplay.cpp">
+      <Filter>Source Files\Tools</Filter>
     </ClCompile>
     <ClCompile Include="levelloop.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Loops</Filter>
+    </ClCompile>
+    <ClCompile Include="mower.cpp">
+      <Filter>Source Files\Objects</Filter>
     </ClCompile>
     <ClCompile Include="grassfield.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="winloop.cpp">
+      <Filter>Source Files\Loops</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lawnmower.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="properties.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="mower.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="GameModeLoop.h">
+      <Filter>Header Files\Loops</Filter>
     </ClInclude>
     <ClInclude Include="grassfield.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GameModeLoop.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
     <ClInclude Include="levelloop.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Loops</Filter>
+    </ClInclude>
+    <ClInclude Include="mower.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="textdisplay.h">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="properties.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="winloop.h">
+      <Filter>Header Files\Loops</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

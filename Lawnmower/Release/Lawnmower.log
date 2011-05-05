@@ -1,0 +1,21 @@
+﻿Build started 4/23/2011 2:51:01 PM.
+     1>Project "F:\Lawnmower\Lawnmower\Lawnmower.vcxproj" on node 2 (build target(s)).
+     1>PrepareForBuild:
+         Creating directory "F:\Lawnmower\Release\".
+       InitializeBuildStatus:
+         Creating "Release\Lawnmower.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         D:\VS\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt grassfield.cpp lawnmower.cpp levelloop.cpp mower.cpp
+         grassfield.cpp
+     1>f:\lawnmower\lawnmower\grassfield.h(3): fatal error C1083: Cannot open include file: 'SDL.h': No such file or directory
+         lawnmower.cpp
+     1>f:\lawnmower\lawnmower\grassfield.h(3): fatal error C1083: Cannot open include file: 'SDL.h': No such file or directory
+         levelloop.cpp
+     1>f:\lawnmower\lawnmower\grassfield.h(3): fatal error C1083: Cannot open include file: 'SDL.h': No such file or directory
+         mower.cpp
+     1>f:\lawnmower\lawnmower\grassfield.h(3): fatal error C1083: Cannot open include file: 'SDL.h': No such file or directory
+     1>Done Building Project "F:\Lawnmower\Lawnmower\Lawnmower.vcxproj" (build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:02.16

@@ -3,6 +3,9 @@
 #include "lawnmower.h"
 Mower* Mower::mowers[4];
 int Mower::count;
+const float Mower::radius = 1.0f;
+const float Mower::mass = 1.2f;
+const float Mower::coeff = 0.99f;
 void Mower::processMovement(){
 	int curclock = clock();
 	int timepassed = curclock - this->last_update;
@@ -10,32 +13,33 @@ void Mower::processMovement(){
 	if (timepassed == 0) { return; }
 	//Process Accelleration
 	this->velx *= pow(0.999,timepassed);
-	this->vely *= pow(0.999,timepassed);
+	this->velz *= pow(0.999,timepassed);
 	for(int i =0; i<=timepassed;i++) {		
 		if (this->velx >= this->settings.maxvelocity) {
 			this->velx = this->settings.maxvelocity;
 		} else {
 			this->velx += this->accx / 1000;
 		}
-		if (this->vely >= this->settings.maxvelocity) {
-			this->vely = this->settings.maxvelocity;
+		if (this->velz >= this->settings.maxvelocity) {
+			this->velz = this->settings.maxvelocity;
 		} else {
-			this->vely += this->accy / 1000;
+			this->velz += this->accy / 1000;
 		}
 		//Process Velocity
-		this->lup += this->vely / 10;
+		this->lup += this->velz / 10;
 		this->lright += this->velx / 10;
+		checkCollision();
 		checkGrassCollision();
 	}
 		//this rotation stuff is necessary
-	if (velx != 0 || vely != 0) {
+	if (velx != 0 || velz != 0) {
 		if (velx == 0) {
-			if (vely > 0) {
+			if (velz > 0) {
 				lrotation = 180;
 			} else {
 				lrotation = 0;
 			}
-		} else if (vely == 0) {
+		} else if (velz == 0) {
 			if (velx > 0) {
 				lrotation = 270;
 			} else {
@@ -43,13 +47,13 @@ void Mower::processMovement(){
 			}
 		} else {
 			//some combination of both
-			lrotation = atan((double)velx/vely) * 180/3.1415926;
-			if (vely > 0) {
+			lrotation = atan((double)velx/velz) * 180/3.1415926;
+			if (velz > 0) {
 				lrotation += 180;
 			}
 		}
 	}
-	checkCollision();
+	
 }
 
 //draws a 1x1 cube. Lawnmower is drawn entirely of these cubes (not including the wheels) (extorted of course)
@@ -103,12 +107,79 @@ void Mower::drawCube(int size){
 		glEnd();
 	}
 }
+void Mower::updateLastCollisionCheck()
+{
+	clast_update = clock();
+	clast_right = this->getRight();
+	clast_up = this->getUp();
+}
+bool Mower::doMowersCollide(float m1up,float m1right,float m2up,float m2right)
+{
+	float distance = pow((float) pow(m1up - m2up,2) + pow(m1right-m2right,2),0.5f);
+	if (distance < radius * 2) {
+		return true;
+	}
+	return false;
+}
+void Mower::checkMowerCollision(Mower *othermower)
+{
+
+	//first do a cheaper collision detection using spheres.
+	//creating a bounding volume around the lawnmowers, the sum of the radius
+	//cannot be larger than the distance between the two radii.
+	if(doMowersCollide(this->getUp(),this->getRight(),othermower->getUp(),othermower->getRight())) {
+		if (prevcol == true)
+			return;
+		float curlasttime = clast_update;
+		float curtime = clock();
+		float curup1;
+		float curup2;
+		float curright1;
+		float curright2;
+		bool iscol = true;
+		float curpoint = 1.0f;
+		for(int i=0;(i<=5) || (i>5 && !iscol);i++) {
+			if (iscol) {
+			//back up half a step back
+				curpoint /= 2;
+			} else {
+			//half a step forward
+				curpoint += curpoint /2;
+			}
+			curup1 = this->getLastUp() + (this->getUp()-this->getLastUp())*curpoint;
+			curup2 = othermower->getLastUp() + (othermower->getUp()-othermower->getLastUp())*curpoint;
+			curright1 = this->getLastRight() + (this->getRight()-this->getLastRight())*curpoint;
+			curright2 = othermower->getLastRight() + (othermower->getRight()-othermower->getLastRight())*curpoint;	
+			iscol = doMowersCollide(curup1,curright1,curup2,curright2);
+		}
+		float collnormal[3] = {curright1-curright2,0,curup1-curup2};
+		this->setUp(curup1);
+		this->setRight(curright1);
+		othermower->setUp(curup2);
+		othermower->setRight(curright2);
+		float A = (mass * mass * (1+coeff) *
+			((this->getVelocityX() - othermower->getVelocityX()*collnormal[0]) + 
+			(this->getVelocityZ() - othermower->getVelocityZ()*collnormal[2])))
+			/ (mass * 2);
+		this->setVelocityX(this->getVelocityX() + A * collnormal[0]);
+		this->setVelocityZ(this->getVelocityZ() + A * collnormal[2]);
+		othermower->setVelocityX(othermower->getVelocityX() - A * collnormal[0]);
+		othermower->setVelocityZ(othermower->getVelocityZ() - A * collnormal[2]);
+		this->last_update = clast_update + ((curtime-clast_update)*curpoint);
+		prevcol = true;
+	} else {
+		prevcol = false;
+	}
+}
 void Mower::checkGrassCollision()
 {
-	if(field->isGrassCut((int)lright,(int)lup) == false ) {
+	
+	if(field->isGrassCut((int)(lright+0.5),(int)(lup+0.5)) == false ) {
 		score++;
-		field->cutGrass((int)lright,(int)lup);
+		field->cutGrass((int)(lright+0.5),(int)(lup+0.5));
 	}
+	
+	
 }
 void Mower::checkCollision()
 {
@@ -118,7 +189,7 @@ void Mower::checkCollision()
 	}
 	if(lup < 0) {
 		lup = 0;
-		this->vely = -this->vely * 0.3;
+		this->velz = -this->velz * 0.3;
 	}
 	if(lright > field->getFieldSize()) {
 		lright = field->getFieldSize();
@@ -126,10 +197,8 @@ void Mower::checkCollision()
 	}
 	if(lup > field->getFieldSize()) {
 		lup = field->getFieldSize();
-		this->vely = -this->vely * 0.3;
-	}
-	
-	
+		this->velz = -this->velz * 0.3;
+	}	
 }
 
 void Mower::draw()
@@ -138,9 +207,9 @@ void Mower::draw()
 		glTranslatef(this->lright,0,this->lup);
 		glTranslatef(0,0,0);
 		glScalef(0.1,0.1,0.1);
-		glTranslatef(4.0f,0,4.0f);
+		glTranslatef(4.0f,0,8.0f);
 		glRotatef(this->lrotation,0,1,0);
-		glTranslatef(-4.0f,0,-4.0f);
+		glTranslatef(-4.0f,0,-8.0f);
 		glPushMatrix();
 		drawModel(); //Draw Lawnmower
 		glPopMatrix();
@@ -211,10 +280,6 @@ void Mower::handleKeyboardUp(SDL_KeyboardEvent Event)
 		this->accx += this->settings.acceleration;
 	else if (Event.keysym.sym == settings.moveright)
 		this->accx -= this->settings.acceleration;
-
-	//if(Event.keysym.sym == reset) {
-	//	growGrass();	
-	//}
 }
 
 void Mower::handleKeyboardDown(SDL_KeyboardEvent Event)
@@ -237,7 +302,7 @@ void Mower::handleJoystickAxis(SDL_JoyAxisEvent Event)
 		if(abs(velx) < 0.125) {velx = 0;}
 	} else if(Event.axis == 1) {
 		this->accy = this->settings.acceleration /60000.0f;
-		if(abs(vely) < 0.125) {vely = 0;}
+		if(abs(velz) < 0.125) {velz = 0;}
 	}
 }
 
@@ -254,7 +319,9 @@ MowerSettings Mower::msettings[4] =
 	{0,1,0,1},
 	{1,0,0,1},
 	0.2,
-	0.5
+	0.5,
+	5.0,
+	5.0
 },
 {
 	SDLK_w,
@@ -265,7 +332,9 @@ MowerSettings Mower::msettings[4] =
 	{1,1,0,1},
 	{1,0,1,1},
 	0.2,
-	0.5
+	0.5,
+	10.0,
+	10.0
 },
 {
 	SDLK_UP,
@@ -276,7 +345,9 @@ MowerSettings Mower::msettings[4] =
 	{0,1,0,1},
 	{1,0,0,1},
 	0.2,
-	0.5
+	0.5,
+	15.0,
+	15.0
 },
 {
 	SDLK_UP,
@@ -287,5 +358,7 @@ MowerSettings Mower::msettings[4] =
 	{0,1,0,1},
 	{1,0,0,1},
 	0.2,
-	0.5
+	0.5,
+	20.0,
+	20.0
 }};

@@ -2,16 +2,18 @@
 #define LAWNMOWER_H
 #define CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
+#include <assert.h>
 #include "grassfield.h"
 #include <iostream>
+#include <stdio.h>
 #include <assert.h>
-
 #include <cstdlib>
 #include <windows.h>
 #include <ctime>
 #include <cmath>
 #include "SDL.h"
 #include "SDL_opengl.h"
+#include "textdisplay.h"
 #include "SDL_video.h"
 #include "SDL_joystick.h"
 #include "properties.h"
@@ -23,9 +25,7 @@
 
 using namespace std;
 
-static GLfloat transX = -6.0; //Translate around the X axis
-static GLfloat transY = -11.0; // Translate around the Y axis
-static GLfloat transZ = -25.0; // Translate around the Z axis
+
 
 /**
 Run given Gameloop until loop exit

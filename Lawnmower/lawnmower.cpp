@@ -17,10 +17,13 @@ void runGameLoop(GameModeLoop* myloop)
 		prevclock = curclock;
 	}
 }
+
 void initGL()
 {
-	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
-	SDL_Surface* screen = SDL_SetVideoMode(640,480,16,SDL_OPENGL |SDL_DOUBLEBUF|SDL_ANYFORMAT |SDL_RESIZABLE);
+	SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
+	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 ); 
+
+	SDL_Surface* screen = SDL_SetVideoMode(640,480,0,SDL_HWPALETTE | SDL_HWSURFACE |SDL_OPENGL);
 	GameModeLoop::windowheight = 480;
 	GameModeLoop::windowwidth = 640;
 	glEnable(GL_DEPTH_TEST);
@@ -28,7 +31,9 @@ void initGL()
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_POLYGON_SMOOTH);
 	glEnable(GL_BLEND);
+	
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 }
 int main(int argc, char** argv)
 {
@@ -37,6 +42,11 @@ int main(int argc, char** argv)
 	myloop->addMower(0);
 	myloop->addMower(1);
 	runGameLoop(myloop);
+	while (GameModeLoop::next != nullptr) {
+		GameModeLoop* mynext = GameModeLoop::next;
+		GameModeLoop::next = nullptr;
+		runGameLoop(mynext);
+	}
 	SDL_Quit();
 	return 0;
 }

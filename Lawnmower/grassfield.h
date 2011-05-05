@@ -9,10 +9,27 @@ class GrassField
 {
 protected:
 	int fieldsize; //Static Size of Field fieldsize X fieldsize
+	/**
+	total number of squares for this field
+	**/
+	int totalsquares;
+	/**
+	Total number of squares remaining
+	**/
+	int squaresremaining;
+	/**
+	2D array determining squares that are cut
+	**/
 	int** grasscut;
+	/**
+	Textures for the 3 sides of the field
+	**/
 	GLuint side_texture;
 	GLuint ttop_texture;
 	GLuint bot_texture;
+	/**
+	id for the display list
+	**/
 	GLuint fmodelid;
 	/**
 	Builds the Model Display List on object initialization
@@ -24,6 +41,8 @@ public:
 	{
 		fieldsize = size;
 		grasscut[size+1][size+1];
+		totalsquares = (size+1)*(size+1);
+		squaresremaining = totalsquares;
 		grasscut = new int*[fieldsize+1];
 		for(int i = 0; i <=fieldsize+1;i++)
 			grasscut[i] = new int[fieldsize+1];
@@ -52,6 +71,20 @@ public:
 	int getFieldSize()
 	{
 		return fieldsize;
+	}
+	/**
+	Gets the total number of square
+	**/
+	int getTotalSquares()
+	{
+		return totalsquares;
+	}
+	/**
+	Gets the total number of squares remaining
+	**/
+	int getSquaresRemaining()
+	{
+		return squaresremaining;
 	}
 	/**
 	Checks to see if grass is cut

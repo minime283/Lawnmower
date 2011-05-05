@@ -57,7 +57,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL.lib;SDLmain.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL.lib;SDLmain.lib;SDL_ttf.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -78,10 +78,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GameModeLoop.cpp" />
     <ClCompile Include="grassfield.cpp" />
     <ClCompile Include="lawnmower.cpp" />
     <ClCompile Include="levelloop.cpp" />
     <ClCompile Include="mower.cpp" />
+    <ClCompile Include="textdisplay.cpp" />
+    <ClCompile Include="winloop.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameModeLoop.h" />
@@ -90,6 +93,8 @@
     <ClInclude Include="levelloop.h" />
     <ClInclude Include="mower.h" />
     <ClInclude Include="properties.h" />
+    <ClInclude Include="textdisplay.h" />
+    <ClInclude Include="winloop.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

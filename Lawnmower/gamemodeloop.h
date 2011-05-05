@@ -44,5 +44,6 @@ public:
 	Height of the window in pixels
 	**/
 	static int windowheight;
+	static GameModeLoop* next;
 };
 #endif
