@@ -1,4 +1,44 @@
 #include "grassfield.h"
+
+GrassField::GrassField(int size)
+{
+	fieldsize = size;
+	grasscut[size+1][size+1];
+	totalsquares = (size+1)*(size+1);
+	squaresremaining = totalsquares;
+	grasscut = new int*[fieldsize+1];
+	for(int i = 0; i <=fieldsize+1;i++)
+		grasscut[i] = new int[fieldsize+1];
+
+	fmodelid = glGenLists(1);
+	buildModel();	
+	growGrass();
+		
+}
+GrassField::~GrassField()
+{
+	for(int i=0;i<=fieldsize;i++) {
+		delete [] grasscut[i];
+	}
+	delete[] grasscut;
+	glDeleteTextures(1,&side_texture);
+	glDeleteTextures(1,&ttop_texture);
+	glDeleteTextures(1,&bot_texture);
+	glDeleteLists(fmodelid,1);
+}
+int GrassField::getFieldSize()
+{
+	return fieldsize;
+}
+int GrassField::getTotalSquares()
+{
+	return totalsquares;
+}
+int GrassField::getSquaresRemaining()
+{
+	return squaresremaining;
+}
+
 //Method for position of grass, and if the grass has been cut
 void GrassField::growGrass(){
 	int x,y;

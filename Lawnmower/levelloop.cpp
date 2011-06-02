@@ -4,6 +4,23 @@ int GameModeLoop::windowheight;
 GLfloat LevelLoop::transX = -6.0; //Translate around the X axis
 GLfloat LevelLoop::transY = -11.0; // Translate around the Y axis
 GLfloat LevelLoop::transZ = -25.0; // Translate around the Z axis
+LevelLoop::LevelLoop()
+{
+	mowers[0] = nullptr;
+	mowers[1] = nullptr;
+	mowers[2] = nullptr;
+	mowers[3] = nullptr;
+}
+LevelLoop::~LevelLoop()
+{
+	for(int i=0;i<=3;i++) {
+		if(mowers[i] != nullptr) 
+			delete mowers[i];
+	}
+	delete field;
+	delete mowers;
+}
+
 void LevelLoop::init()
 {
 	field = new GrassField(40);

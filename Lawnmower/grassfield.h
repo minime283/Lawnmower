@@ -37,55 +37,22 @@ protected:
 	void buildModel();
 public:
 	//Creates a New Grassfield
-	GrassField(int size)
-	{
-		fieldsize = size;
-		grasscut[size+1][size+1];
-		totalsquares = (size+1)*(size+1);
-		squaresremaining = totalsquares;
-		grasscut = new int*[fieldsize+1];
-		for(int i = 0; i <=fieldsize+1;i++)
-			grasscut[i] = new int[fieldsize+1];
-
-		fmodelid = glGenLists(1);
-		buildModel();	
-		growGrass();
-		
-	}
+	GrassField(int size);
 	//Deletes a Grassfield
-	~GrassField()
-	{
-		for(int i=0;i<=fieldsize;i++) {
-			delete [] grasscut[i];
-		}
-		delete[] grasscut;
-		glDeleteTextures(1,&side_texture);
-		glDeleteTextures(1,&ttop_texture);
-		glDeleteTextures(1,&bot_texture);
-		glDeleteLists(fmodelid,1);
-	}
+	~GrassField();
 	/***
 	Gets the width and height of field
 	@return int fieldsize
 	***/
-	int getFieldSize()
-	{
-		return fieldsize;
-	}
+	int getFieldSize();
 	/**
 	Gets the total number of square
 	**/
-	int getTotalSquares()
-	{
-		return totalsquares;
-	}
+	int getTotalSquares();
 	/**
 	Gets the total number of squares remaining
 	**/
-	int getSquaresRemaining()
-	{
-		return squaresremaining;
-	}
+	int getSquaresRemaining();
 	/**
 	Checks to see if grass is cut
 	@param int x the x position to check

@@ -17,15 +17,9 @@ public:
 	@param Mower winner the Mower that won the round
 	@param int fieldsize the size of the field
 	**/
-	WinLoop(Mower* winner, int fieldsize)
-	{
-		this->winner = winner;
-		this->fieldsize = fieldsize;
-	}
+	WinLoop(Mower* winner, int fieldsize);
 	
-	~WinLoop()
-	{
-	}
+	~WinLoop();
 private:
 	/**
 	The Winner of the round

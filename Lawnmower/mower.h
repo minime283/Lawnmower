@@ -21,8 +21,8 @@ private:
 	static const float coeff;
 	bool Mower::doMowersCollide(float m1up,float m1right,float m2up,float m2right);
 	/**
+	Used to detect collision resolution, position of lawnmower at previous collision detection
 	**/
-	//int clast_update;
 	GLfloat clast_up;
 	GLfloat clast_right;
 	
@@ -60,29 +60,7 @@ private:
 	/**
 	Initializes the lawnmower
 	**/
-	void init(int index)
-	{
-		last_update = 0;
-		clast_update =0;
-		modelid = glGenLists(1);
-		this->index = index;
-		settings = msettings[index];
-		Mower::count++;
-		initModel();
-		score = 0;
-		velx = 0.0f;
-		velz = 0.0f;
-		accx = 0.0f;
-		accy = 0.0f;
-		clast_up = settings.startup;
-		clast_right = settings.startright;
-		lup = settings.startup;
-		lright =settings.startright;
-		lrotation =0.0f;
-		prevcol = false;
-	}
-	
-	
+	void Mower::init(int index);
 	/**
 	Score of the player
 	**/
@@ -103,26 +81,25 @@ private:
 	**/
 	int jaxisy;
 	int jaxisx;
+	//joystick id
 	int jid;
-	/**displaylist id **/
+	//id for storing the model in a display list
 	int modelid;
-		static MowerSettings msettings[4];
+	static MowerSettings msettings[4];
 protected:
 	static Mower* mowers[4];
 	char sscore[10];
 	static int count;
 
 public:
-	const char* getScore()
-	{
-		sprintf(sscore,"%i (%i%c)",score,(int)((float)score/(float)this->field->getTotalSquares()*100),'%');
-		//score[strlen(score)] = '\0';
-		return sscore;
-	}
-	int getNumScore()
-	{
-		return score;
-	}
+	/**
+	Gets the Score in int form
+	**/
+	int getNumScore();
+	/**
+	Gets the Score in a formatted string
+	**/
+	const char* getScore();
 	/**
 	Checks the collision of the mower and the edges of the screen
 	**/
@@ -150,94 +127,56 @@ public:
 	/**
 	Creates a new mower instance based on mower type
 	**/
-	Mower(int index)
-	{
-		init(index);
-	}
+	Mower(int index);
 	/**
 	Cleans up the mower
 	**/
-	~Mower()
-	{
-		glDeleteLists(1,modelid);
-	}
+	~Mower();
 	/**
 	Returns up coordinate
 	**/
-	GLfloat getUp()
-	{
-		return this->lup;
-	}
+	GLfloat getUp();
 	/**
 	Sets the up coordinate
 	**/
-	void setUp(GLfloat up)
-	{
-		this->lup = up;
-	}
+	void setUp(GLfloat up);
 	/**
 	Returns right coordinate
 	**/
-	GLfloat getRight()
-	{
-		return this->lright;
-	}
+	GLfloat getRight();
 	/**
 	Sets the right coordinate
 	**/
-	void setRight(GLfloat right) 
-	{
-		this->lright = right;
-	}
+	void setRight(GLfloat right);
 	/**
 	Gets the up at the previous collision check
 	**/
-	GLfloat getLastUp()
-	{
-		return this->clast_up;
-	}
-	/**
-	Gets the current velocity in the X direction
-	**/
-	GLfloat getVelocityX()
-	{
-		return this->velx;
-	}
-	/**
-	Sets the current velocity in the X direction
-	**/
-	void setVelocityX(GLfloat velx)
-	{
-		this->velx = velx;
-	}
-	/**
-	Sets the current velocity in the Z direction
-	**/
-	void setVelocityZ(float velz)
-	{
-		this->velz = velz;
-	}
-	/**
-	Gets the current velocity in the Z direction
-	**/
-	GLfloat getVelocityZ()
-	{
-		return this->velz;
-	}
+	GLfloat getLastUp();
 	/**
 	Gets the previous position of right
 	**/
-	GLfloat getLastRight()
-	{
-		return this->clast_right;
-	}
+	GLfloat getLastRight();
+	/**
+	Gets the current velocity in the X direction
+	**/
+	GLfloat Mower::getVelocityX();
+	/**
+	Sets the current velocity in the X direction
+	**/
+	void setVelocityX(GLfloat velx);
+	/**
+	Sets the current velocity in the Z direction
+	**/
+	void setVelocityZ(float velz);
+	/**
+	Gets the current velocity in the Z direction
+	**/
+	GLfloat getVelocityZ();
+
 	/** 
 	Gets the mower index
 	**/
-	int getMIndex()
-	{
-		return this->index;
-	}
+	int getMIndex();
 	/**
 	Updates the last collision check
 	**/
@@ -245,14 +184,11 @@ public:
 	/**
 	Sets the field 
 	**/
-	void setField(GrassField *field)
-	{
-		this->field = field;
-	}
-	MowerSettings getSettings()
-	{
-		return settings;
-	}
+	void setField(GrassField *field);
+	/**
+	Gets the settings struct
+	**/
+	MowerSettings getSettings();
 	/**
 	Processes the movement position for this cycle
 	**/
@@ -265,6 +201,5 @@ public:
 	Draws the model
 	**/
 	void drawModel();
-
 };
 #endif

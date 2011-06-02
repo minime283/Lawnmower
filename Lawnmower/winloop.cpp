@@ -1,4 +1,12 @@
 #include "winloop.h"
+WinLoop::WinLoop(Mower* winner, int fieldsize)
+{
+	this->winner = winner;
+	this->fieldsize = fieldsize;
+}
+WinLoop::~WinLoop()
+{
+}
 void WinLoop::init()
 {
 	text = new TextDisplay(0,0,50);

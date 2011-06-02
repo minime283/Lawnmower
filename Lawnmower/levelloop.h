@@ -24,22 +24,8 @@ public:
 	@param int index
 	**/
 	void addMower(int index);
-	LevelLoop()
-	{
-		mowers[0] = nullptr;
-		mowers[1] = nullptr;
-		mowers[2] = nullptr;
-		mowers[3] = nullptr;
-	}
-	~LevelLoop()
-	{
-		for(int i=0;i<=3;i++) {
-			if(mowers[i] != nullptr) 
-				delete mowers[i];
-		}
-		delete field;
-		delete mowers;
-	}
+	LevelLoop();
+	~LevelLoop();
 private:
 	/**
 	The field for the level

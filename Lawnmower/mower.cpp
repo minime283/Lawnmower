@@ -6,6 +6,96 @@ int Mower::count;
 const float Mower::radius = 1.0f;
 const float Mower::mass = 1.2f;
 const float Mower::coeff = 0.99f;
+Mower::Mower(int index)
+{
+	init(index);
+}
+Mower::~Mower()
+{
+	glDeleteLists(1,modelid);
+}
+GLfloat Mower::getUp()
+{
+	return this->lup;
+}
+void Mower::setUp(GLfloat up)
+{
+	this->lup = up;
+}
+GLfloat Mower::getRight()
+{
+	return this->lright;
+}
+void Mower::setRight(GLfloat right) 
+{
+	this->lright = right;
+}
+GLfloat Mower::getVelocityX()
+{
+	return this->velx;
+}
+GLfloat Mower::getVelocityZ()
+{
+	return this->velz;
+}
+void Mower::setVelocityX(GLfloat velx)
+{
+	this->velx = velx;
+}
+void Mower::setVelocityZ(float velz)
+{
+	this->velz = velz;
+}
+GLfloat Mower::getLastUp()
+{
+	return this->clast_up;
+}
+GLfloat Mower::getLastRight()
+{
+	return this->clast_right;
+}
+int Mower::getMIndex()
+{
+	return this->index;
+}
+MowerSettings Mower::getSettings()
+{
+	return settings;
+}
+void Mower::setField(GrassField *field)
+{
+	this->field = field;
+}
+void Mower::init(int index)
+{
+	last_update = 0;
+	clast_update =0;
+	modelid = glGenLists(1);
+	this->index = index;
+	settings = msettings[index];
+	Mower::count++;
+	initModel();
+	score = 0;
+	velx = 0.0f;
+	velz = 0.0f;
+	accx = 0.0f;
+	accy = 0.0f;
+	clast_up = settings.startup;
+	clast_right = settings.startright;
+	lup = settings.startup;
+	lright =settings.startright;
+	lrotation =0.0f;
+	prevcol = false;
+}
+const char* Mower::getScore()
+{
+	sprintf(sscore,"%i (%i%c)",score,(int)((float)score/(float)this->field->getTotalSquares()*100),'%');
+	return sscore;
+}
+int Mower::getNumScore()
+{
+	return score;
+}
 void Mower::processMovement(){
 	int curclock = clock();
 	int timepassed = curclock - this->last_update;
@@ -31,8 +121,9 @@ void Mower::processMovement(){
 		checkCollision();
 		checkGrassCollision();
 	}
-		//this rotation stuff is necessary
+	//rotate the lawnmower to the direction it is moving
 	if (velx != 0 || velz != 0) {
+		//complete right angles
 		if (velx == 0) {
 			if (velz > 0) {
 				lrotation = 180;
@@ -46,7 +137,7 @@ void Mower::processMovement(){
 				lrotation = 90;
 			}
 		} else {
-			//some combination of both
+			//other angles
 			lrotation = atan((double)velx/velz) * 180/3.1415926;
 			if (velz > 0) {
 				lrotation += 180;
@@ -56,32 +147,6 @@ void Mower::processMovement(){
 	
 }
 
-//draws a 1x1 cube. Lawnmower is drawn entirely of these cubes (not including the wheels) (extorted of course)
-void drawCube(int size){
-	float plane=0;
-	for(plane=0;plane<=size;plane+=size) {
-		glBegin(GL_POLYGON);
-			glVertex3f(0,0,plane );
-			glVertex3f(size,0,plane);
-			glVertex3f(size,size,plane);
-			glVertex3f(0,0+size,plane);
-		glEnd();
-
-		glBegin(GL_POLYGON);
-			glVertex3f(0,plane,0);
-			glVertex3f(size,plane,0);
-			glVertex3f(size,plane,size);
-			glVertex3f(0,plane,size);
-		glEnd();
-		
-		glBegin(GL_POLYGON);
-			glVertex3f(plane,0,0);
-			glVertex3f(plane,size,0);
-			glVertex3f(plane,size,size);
-			glVertex3f(plane,0,size);
-		glEnd();
-	}
-}
 void Mower::drawCube(int size){
 	float plane=0;
 	for(plane=0;plane<=size;plane+=size) {
@@ -123,7 +188,6 @@ bool Mower::doMowersCollide(float m1up,float m1right,float m2up,float m2right)
 }
 void Mower::checkMowerCollision(Mower *othermower)
 {
-
 	//first do a cheaper collision detection using spheres.
 	//creating a bounding volume around the lawnmowers, the sum of the radius
 	//cannot be larger than the distance between the two radii.
@@ -238,19 +302,6 @@ void Mower::initModel(){
 	glTranslatef(2,2,6);
 	drawCube(4);
 
-	//draw the four wheels
-	glPushMatrix();
-		glColor3f(0,0,0);
-		glRotatef(90,0,1,0);
-		glTranslatef(1.9f,0.6f,6.2f);
-		//glutSolidTorus(0.7, 1.5, 10, 10);
-		glTranslatef(0.0f,6.0f,0);
-		//glutSolidTorus(0.7, 1.5, 10, 10);
-		glTranslatef(0.0f,0.0f,-8.0f);
-		//glutSolidTorus(0.7, 1.5, 10, 10);
-		glTranslatef(0.0f,-6.0f,0);
-		//glutSolidTorus(0.7, 1.5, 10, 10);
-	glPopMatrix();
 	//draw the handles
 	glPushMatrix();
 		glColor4fv(settings.handlecol);
@@ -307,7 +358,7 @@ void Mower::handleJoystickAxis(SDL_JoyAxisEvent Event)
 }
 
 
-#endif
+
 
 MowerSettings Mower::msettings[4] =
 {{
@@ -362,3 +413,4 @@ MowerSettings Mower::msettings[4] =
 	20.0,
 	20.0
 }};
+#endif
