@@ -1,6 +1,6 @@
 #ifndef MOWER_CPP
 #define MOWER_CPP
-#include "lawnmower.h"
+#include "mower.h"
 Mower* Mower::mowers[4];
 int Mower::count;
 const float Mower::radius = 1.0f;

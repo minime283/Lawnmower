@@ -1,5 +1,6 @@
 #ifndef TEXTDISPLAY_H
 #define TEXTDISPLAY_H
+#define TEXTDISPLAY_FONTPATH "../Assets/times.ttf"
 #include <assert.h>
 #include "SDL.h"
 #include "SDL_ttf.h"
@@ -11,66 +12,44 @@
 
 using namespace std;
 /**
-Displays the text
+Object that draws the text (using a truetype font library) to a bitmap, 
+and then uses the bitmap to texture a quad drawn onscreen.
 **/
 class TextDisplay{
 public:
-	/**
-	@param int viewportwidth the viewport width
-	@param int viewportheight the viewport height
-	Sets custom viewport parameters
-	**/
-	void setViewportParameters(int viewportwidth, int viewportheight)
-	{
-		this->viewportwidth = viewportwidth;
-		this->viewportheight = viewportheight;
-	}
-	/**
-	@param bool usecolor use a background color
-	@param GLfloat bgcolor the color to use (for glColor3fv function)
-	**/
-	void setBackgroundColor(bool usecolor,GLfloat bgcolor[4])
-	{
-		this->backgroundcolor = usecolor;
-		for(int i=0;i<=3;i++)
-			this->bgcolor[i] = bgcolor[i];
-	}
-	/**
-	@param int r the red value
-	@param int g the green value
-	@param int b the blue value
-	**/
-	void setColor(int r, int g, int b)
-	{
-		this->color.b = b;
-		this->color.g = g;
-		this->color.r = r;
-	}
 	/**
 	@param int x the x position
 	@param int y the y position
 	@param int size the size (in pts) for the font
 	**/
-	TextDisplay(int x, int y, int size)
-	{
-		TTF_Init();
-		this->x = x;
-		this->y = y;
-		this->size = size;
-		this->color.b = 255;
-		this->color.g = 255;
-		this->color.r = 255;
-		this->viewportwidth = GameModeLoop::windowwidth;
-		this->viewportheight = GameModeLoop::windowheight;
-		this->textureid = 99;
-		textureid = 0;
-	}
+	TextDisplay(int x, int y, int size);
 	~TextDisplay();
+	/**
+	@param int viewportwidth the viewport width
+	@param int viewportheight the viewport height
+	Sets custom viewport parameters
+	**/
+	void setViewportParameters(int viewportwidth, int viewportheight);
+	/**
+	@param bool usecolor use a background color
+	@param GLfloat bgcolor the color to use (for glColor3fv function)
+	**/
+	void setBackgroundColor(bool usecolor,GLfloat bgcolor[4]);
+	/**
+	@param int r the red value
+	@param int g the green value
+	@param int b the blue value
+	**/
+	void setColor(int r, int g, int b);
 	/**
 	@param char* text
 	**/
 	void drawText(const char* text);
 private:
+	/**
+	The TTF Font object
+	**/
+	TTF_Font *font;
 	/**
 	The texture for this textbox
 	**/

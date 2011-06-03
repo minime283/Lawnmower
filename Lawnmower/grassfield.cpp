@@ -3,6 +3,7 @@
 GrassField::GrassField(int size)
 {
 	fieldsize = size;
+	//create array with grasscut info
 	grasscut[size+1][size+1];
 	totalsquares = (size+1)*(size+1);
 	squaresremaining = totalsquares;
@@ -17,6 +18,7 @@ GrassField::GrassField(int size)
 }
 GrassField::~GrassField()
 {
+	//delete array with grasscut info
 	for(int i=0;i<=fieldsize;i++) {
 		delete [] grasscut[i];
 	}
@@ -39,9 +41,10 @@ int GrassField::getSquaresRemaining()
 	return squaresremaining;
 }
 
-//Method for position of grass, and if the grass has been cut
+
 void GrassField::growGrass(){
 	int x,y;
+	//grows the grass for the field
 	for(x=0;x<=fieldsize;x++) {
 		for(y=0;y<=fieldsize;y++) {
 			grasscut[x][y] = 0;
@@ -50,6 +53,7 @@ void GrassField::growGrass(){
 }
 
 void GrassField::buildModel(){
+	//load side texture
 	SDL_Surface* sur;
 	sur = SDL_LoadBMP("../Assets/side.bmp");
 	glGenTextures(1, &side_texture);
@@ -59,6 +63,7 @@ void GrassField::buildModel(){
 	glTexImage2D(GL_TEXTURE_2D,0,sur->format->BytesPerPixel,sur->w,sur->h,0,GL_RGB,GL_UNSIGNED_BYTE,sur->pixels);
 	SDL_FreeSurface(sur);
 	
+	//load top texture
 	sur = SDL_LoadBMP("../Assets/top.bmp");
 	glGenTextures(1, &ttop_texture);
 	glBindTexture( GL_TEXTURE_2D, ttop_texture );
@@ -67,73 +72,39 @@ void GrassField::buildModel(){
 	glTexImage2D(GL_TEXTURE_2D,0,sur->format->BytesPerPixel,sur->w,sur->h,0,GL_RGB,GL_UNSIGNED_BYTE,sur->pixels);
 	SDL_FreeSurface(sur);
 	
-	sur = SDL_LoadBMP("../Assets/bot.bmp");
-	glGenTextures(1, &bot_texture);
-	glBindTexture( GL_TEXTURE_2D, bot_texture );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glTexImage2D(GL_TEXTURE_2D,0,sur->format->BytesPerPixel,sur->w,sur->h,0,GL_RGB,GL_UNSIGNED_BYTE,sur->pixels);
-	SDL_FreeSurface(sur);
-
 	glNewList(this->fmodelid,GL_COMPILE);
 	GLfloat  x,y;
+	glColor4f(1.0f,1.0f,1.0f,1.0f);
+	glEnable(GL_TEXTURE_2D); //Enable 2D texturing
 	for ( x = 0.0; x <= fieldsize; x += 1 ) {
 	 for ( y = 0.0; y <= fieldsize; y += 1 ) {
-		glColor4f(1.0f,1.0f,1.0f,1.0f);
-		glEnable(GL_TEXTURE_2D); //Enable 2D texturing
-		//Bind texture to the following polygons
-		glBindTexture (GL_TEXTURE_2D, side_texture); 
-		glBegin(GL_QUADS);// begin drawing our cube
-		//  Points for texture mapping  Points for polygon creation
-			glTexCoord2f(0 , 1);		glVertex3f(x, 1, y);
-			glTexCoord2f(1 , 1);		glVertex3f(x+1, 1, y);
-			glTexCoord2f(1 , 0);		glVertex3f(x+1, 0, y);
-			glTexCoord2f(0 , 0);		glVertex3f(x, 0, y);
-
-			//This is the back face
-			glTexCoord2f(0 , 1);		glVertex3f(x, 1, y+1);
-			glTexCoord2f(1 , 1);		glVertex3f(x+1, 1, y+1);
-			glTexCoord2f(1 , 0);		glVertex3f(x+1, 0, y+1);
-			glTexCoord2f(0 , 0);		glVertex3f(x, 0, y+1);
-
-			//This is the left face
-			glTexCoord2f(1 , 0);		glVertex3f(x, 1, y+1);
-			glTexCoord2f(1 , 1);		glVertex3f(x, 1, y);
-			glTexCoord2f(0 , 1);		glVertex3f(x, 0, y);
-			glTexCoord2f(0 , 0);		glVertex3f(x, 0, y+1);
-
-			//This is the right face
+		glBindTexture (GL_TEXTURE_2D, ttop_texture); //Final texture to be bound
+		//Draw the top part of the lawn
+		glBegin(GL_QUADS);
 			glTexCoord2f(0 , 1);		glVertex3f(x+1, 1, y+1);
 			glTexCoord2f(1 , 1);		glVertex3f(x+1, 1, y);
-			glTexCoord2f(1 , 0);		glVertex3f(x+1, 0,   y);
-			glTexCoord2f(0 , 0);		glVertex3f(x+1, 0, y+1);
-		glEnd();
-
-		glBindTexture (GL_TEXTURE_2D, bot_texture);// Next texture to be bound
-		glBegin(GL_QUADS);
-			//This is the bottom face
-			glTexCoord2f(0 , 1);		glVertex3f(x, 0, y+1);
-			glTexCoord2f(1 , 1);		glVertex3f(x, 0, y);
-			glTexCoord2f(1 , 0);		glVertex3f(x+1, 0, y);
-			glTexCoord2f(0 , 0);		glVertex3f(x+1, 0, y+1);
-		glEnd();
-
-		glBindTexture (GL_TEXTURE_2D, ttop_texture); //Final texture to be bound
-		glBegin(GL_QUADS);
-			//This is the top face
-			glTexCoord2f(0 , 1);		glVertex3f(x, 1, y+1);
-			glTexCoord2f(1 , 1);		glVertex3f(x, 1, y);
-			glTexCoord2f(1 , 0);		glVertex3f(x+1, 1, y);
-			glTexCoord2f(0 , 0);		glVertex3f(x+1, 1, y+1);
-		glEnd(); //End Polygon
-		glDisable(GL_TEXTURE_2D); //End Texturing
-
-		//Begin Drawing Grass
-		
-		
-		
+			glTexCoord2f(1 , 0);		glVertex3f(x, 1, y);
+			glTexCoord2f(0 , 0);		glVertex3f(x, 1, y+1);	
+		glEnd(); 
 	  }
+	 //draw the front and right sides of the lawn
+		glBindTexture (GL_TEXTURE_2D, side_texture);
+		glBegin(GL_QUADS);
+			//front side
+			glTexCoord2f(0 , 1);		glVertex3f(x+1, 0, fieldsize+1);
+			glTexCoord2f(1 , 1);		glVertex3f(x, 0, fieldsize+1);
+			glTexCoord2f(1 , 0);		glVertex3f(x,1, fieldsize+1);
+			glTexCoord2f(0 , 0);		glVertex3f(x+1, 1, fieldsize+1);
+			//right side
+			glTexCoord2f(0 , 1);		glVertex3f(fieldsize+1, 0, x+1);
+			glTexCoord2f(1 , 1);		glVertex3f(fieldsize+1, 0, x);
+			glTexCoord2f(1 , 0);		glVertex3f(fieldsize+1, 1, x);
+			glTexCoord2f(0 , 0);		glVertex3f(fieldsize+1, 1, x+1);
+		glEnd();
 	}
+	//the left, back and bottom sides don't need to be drawn as they're
+	//never seen based on the game perspective
+	glDisable(GL_TEXTURE_2D); //End Texturing
 	glEndList();
 }
 

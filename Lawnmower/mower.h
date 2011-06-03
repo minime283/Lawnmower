@@ -6,6 +6,7 @@
 #include "SDL_opengl.h"
 #include "SDL_joystick.h"
 #include "properties.h"
+#include <ctime>
 
 class Mower
 {
@@ -16,6 +17,9 @@ private:
 	int last_update;
 	int clast_update;
 	bool prevcol;
+	/**
+	static values for collision detection
+	**/
 	static const float radius;
 	static const float mass;
 	static const float coeff;

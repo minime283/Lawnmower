@@ -4,21 +4,27 @@
 #include "mower.h"
 #include "textdisplay.h"
 /**
-Loop involving when the win state happens 
+This GameMode replaces the gameplay GameMode when the level completes, and displays the winner in plain text.
 **/
 class WinLoop : public GameModeLoop {
 public:
+	/**
+	Common to all GameMode Loops
+	**/
 	void init();
 	void checkEvents();
 	void simulation();
 	void interpolateState();
 	void render();
+	
 	/**
 	@param Mower winner the Mower that won the round
 	@param int fieldsize the size of the field
 	**/
 	WinLoop(Mower* winner, int fieldsize);
-	
+	/**
+	Destructs the WinLoop
+	**/
 	~WinLoop();
 private:
 	/**
