@@ -188,10 +188,11 @@ bool Mower::doMowersCollide(float m1up,float m1right,float m2up,float m2right)
 }
 void Mower::checkMowerCollision(Mower *othermower)
 {
-	//first do a cheaper collision detection using spheres.
+	//do a cheap collision detection using spheres.
 	//creating a bounding volume around the lawnmowers, the sum of the radius
 	//cannot be larger than the distance between the two radii.
 	if(doMowersCollide(this->getUp(),this->getRight(),othermower->getUp(),othermower->getRight())) {
+		//if previously in collision, do not process new collision until out of collision zone
 		if (prevcol == true)
 			return;
 		float curlasttime = clast_update;
@@ -202,6 +203,7 @@ void Mower::checkMowerCollision(Mower *othermower)
 		float curright2;
 		bool iscol = true;
 		float curpoint = 1.0f;
+		//find point of collision through five iterations
 		for(int i=0;(i<=5) || (i>5 && !iscol);i++) {
 			if (iscol) {
 			//back up half a step back
@@ -210,25 +212,32 @@ void Mower::checkMowerCollision(Mower *othermower)
 			//half a step forward
 				curpoint += curpoint /2;
 			}
+			//get the up and right of both mowers at time of collision
 			curup1 = this->getLastUp() + (this->getUp()-this->getLastUp())*curpoint;
 			curup2 = othermower->getLastUp() + (othermower->getUp()-othermower->getLastUp())*curpoint;
 			curright1 = this->getLastRight() + (this->getRight()-this->getLastRight())*curpoint;
 			curright2 = othermower->getLastRight() + (othermower->getRight()-othermower->getLastRight())*curpoint;	
+			//check to see if the mowers collide
 			iscol = doMowersCollide(curup1,curright1,curup2,curright2);
 		}
+		//collision normal
 		float collnormal[3] = {curright1-curright2,0,curup1-curup2};
+		//move mowers to the point in which the collision started
 		this->setUp(curup1);
 		this->setRight(curright1);
 		othermower->setUp(curup2);
 		othermower->setRight(curright2);
+		//Find the new velocities of the mowers
 		float A = (mass * mass * (1+coeff) *
 			((this->getVelocityX() - othermower->getVelocityX()*collnormal[0]) + 
 			(this->getVelocityZ() - othermower->getVelocityZ()*collnormal[2])))
 			/ (mass * 2);
+		//apply new velocities of mowers to their current velocities
 		this->setVelocityX(this->getVelocityX() + A * collnormal[0]);
 		this->setVelocityZ(this->getVelocityZ() + A * collnormal[2]);
 		othermower->setVelocityX(othermower->getVelocityX() - A * collnormal[0]);
 		othermower->setVelocityZ(othermower->getVelocityZ() - A * collnormal[2]);
+		//set this as the previous collison check
 		this->last_update = clast_update + ((curtime-clast_update)*curpoint);
 		prevcol = true;
 	} else {
@@ -237,16 +246,14 @@ void Mower::checkMowerCollision(Mower *othermower)
 }
 void Mower::checkGrassCollision()
 {
-	
 	if(field->isGrassCut((int)(lright+0.5),(int)(lup+0.5)) == false ) {
 		score++;
 		field->cutGrass((int)(lright+0.5),(int)(lup+0.5));
-	}
-	
-	
+	}	
 }
 void Mower::checkCollision()
 {
+	//check collision with boundaries
 	if(lright < 0) {
 		lright = 0;
 		this->velx = -this->velx * 0.3;
@@ -359,7 +366,7 @@ void Mower::handleJoystickAxis(SDL_JoyAxisEvent Event)
 
 
 
-
+//init the settings for each mower
 MowerSettings Mower::msettings[4] =
 {{
 	SDLK_UP,

@@ -143,6 +143,7 @@ void GrassField::render(){
 }
 
 bool GrassField::isGrassCut(int x, int y) {
+	//check if cut is grass
 	if (grasscut[x][y]==1) {
 		return true;
 	}
@@ -150,6 +151,8 @@ bool GrassField::isGrassCut(int x, int y) {
 }
 
 void GrassField::cutGrass(int x, int y) {
+	//cut grass in this area
 	grasscut[x][y] = 1;
+	//update count of total grass cut (for %s)
 	this->squaresremaining--;
 }

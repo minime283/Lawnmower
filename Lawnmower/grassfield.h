@@ -1,5 +1,7 @@
 #ifndef GRASSFIELD_H
 #define GRASSFIELD_H
+#define GRASSFIELD_SIDETEXTURE "../Assets/side.bmp"
+#define GRASSFIELD_TOPTEXTURE "../Assets/top.bmp"
 #include "SDL.h"
 #include "SDL_opengl.h"
 /**

@@ -8,10 +8,12 @@ void runGameLoop(GameModeLoop* myloop)
 	myloop->init();
 	while(myloop->isRunning()) {
 		curclock = clock();
-		if (curclock - prevclock > 17) {
+		//Only do the simulation step every 64ms (4 frames)
+		if (curclock - prevclock > 64) {
 			myloop->checkEvents();
 			myloop->simulation();
-		}	
+		}
+		//interpolate state and render as much as possible (best case once every frame for 60fps)
 		myloop->interpolateState();
 		myloop->render();
 		prevclock = curclock;
@@ -38,13 +40,21 @@ void initGL()
 int main(int argc, char** argv)
 {
 	initGL();
+	//create sample level with two mowers
 	LevelLoop* myloop = new LevelLoop();
 	myloop->addMower(0);
 	myloop->addMower(1);
+	//run game loop
 	runGameLoop(myloop);
+	//if the game loop ends, we check to see if there is another gameloop waiting to replace it
+	//(ex. when the win condition happens, the level loop queues up the "win loop" as the new game mode)
+	//NOT a queue data structure. Doesn't make sense to want to queue two loops ahead, switching modes should be done sparingly.
 	while (GameModeLoop::next != nullptr) {
+		//set the game loop
 		GameModeLoop* mynext = GameModeLoop::next;
+		//clear the waiting game loop
 		GameModeLoop::next = nullptr;
+		//run the new loop in the runGameLoop function
 		runGameLoop(mynext);
 	}
 	SDL_Quit();
